@@ -7,9 +7,10 @@ interface VisaRouteModalProps {
   visa: VisaType | null;
   isOpen: boolean;
   onClose: () => void;
+  onGenerateRoadmap?: (visa: VisaType) => void;
 }
 
-export default function VisaRouteModal({ visa, isOpen, onClose }: VisaRouteModalProps) {
+export default function VisaRouteModal({ visa, isOpen, onClose, onGenerateRoadmap }: VisaRouteModalProps) {
   if (!visa) return null;
 
   return (
@@ -220,10 +221,12 @@ export default function VisaRouteModal({ visa, isOpen, onClose }: VisaRouteModal
                   </motion.button>
                   <motion.button
                     onClick={() => {
-                      // TODO: Integrate with roadmap wizard
-                      console.log('Start roadmap for visa:', visa.id);
+                      if (onGenerateRoadmap && visa) {
+                        onGenerateRoadmap(visa);
+                        onClose();
+                      }
                     }}
-                    className="flex-1 px-6 py-3 bg-gradient-to-r from-accent-primary to-accent-secondary text-white font-semibold rounded-full shadow-card hover:shadow-card-hover transition-shadow"
+                    className="flex-1 px-6 py-3 bg-linear-to-r from-accent-primary to-accent-secondary text-white font-semibold rounded-full shadow-card hover:shadow-card-hover transition-shadow"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >

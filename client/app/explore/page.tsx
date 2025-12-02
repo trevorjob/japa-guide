@@ -27,10 +27,6 @@ const CostCalculator = dynamic(() => import('@/components/features/calculator/Co
   ssr: false,
 });
 
-const RoadmapWizard = dynamic(() => import('@/components/features/roadmap/RoadmapWizard'), {
-  ssr: false,
-});
-
 const ChatPanel = dynamic(() => import('@/components/features/chat/ChatPanel'), {
   ssr: false,
 });
@@ -62,15 +58,6 @@ function MapPageContent() {
           countryCode={selectedCountry}
           isOpen={!!selectedCountry}
         />
-      )}
-
-      {/* Layer 2: Feature Overlays */}
-      {action === 'calculate' && selectedCountry && (
-        <CostCalculator countryCode={selectedCountry} />
-      )}
-
-      {action === 'roadmap' && selectedCountry && (
-        <RoadmapWizard countryCode={selectedCountry} />
       )}
 
       {/* Floating Chat Panel */}

@@ -8,6 +8,7 @@ import type { Country, VisaType } from '@/types';
 import { Spinner } from '@/components/ui/Loading';
 import VisaRouteModal from '@/components/features/visa/VisaRouteModal';
 import CostCalculator from '@/components/features/calculator/CostCalculator';
+import RoadmapWizard from '@/components/features/roadmap/RoadmapWizard';
 
 interface CountryDrawerProps {
   countryCode: string;
@@ -23,6 +24,7 @@ export default function CountryDrawer({ countryCode, isOpen }: CountryDrawerProp
   const [selectedVisa, setSelectedVisa] = useState<VisaType | null>(null);
   const [isVisaModalOpen, setIsVisaModalOpen] = useState(false);
   const [isCostCalculatorOpen, setIsCostCalculatorOpen] = useState(false);
+  const [isRoadmapWizardOpen, setIsRoadmapWizardOpen] = useState(false);
 
   const fetchCountryData = useCallback(async () => {
     try {
@@ -63,6 +65,8 @@ export default function CountryDrawer({ countryCode, isOpen }: CountryDrawerProp
   const handleAction = (action: string) => {
     if (action === 'calculate') {
       setIsCostCalculatorOpen(true);
+    } else if (action === 'roadmap') {
+      setIsRoadmapWizardOpen(true);
     } else {
       router.push(`/explore?country=${countryCode}&action=${action}`);
     }
@@ -71,6 +75,11 @@ export default function CountryDrawer({ countryCode, isOpen }: CountryDrawerProp
   const handleVisaClick = (visa: VisaType) => {
     setSelectedVisa(visa);
     setIsVisaModalOpen(true);
+  };
+
+  const handleVisaRoadmap = (visa: VisaType) => {
+    setSelectedVisa(visa);
+    setIsRoadmapWizardOpen(true);
   };
 
   const getDifficultyLabel = (score: number | null) => {
@@ -340,6 +349,7 @@ export default function CountryDrawer({ countryCode, isOpen }: CountryDrawerProp
         visa={selectedVisa}
         isOpen={isVisaModalOpen}
         onClose={() => setIsVisaModalOpen(false)}
+        onGenerateRoadmap={handleVisaRoadmap}
       />
 
       {/* Cost Calculator */}
@@ -348,6 +358,16 @@ export default function CountryDrawer({ countryCode, isOpen }: CountryDrawerProp
           country={countryData}
           isOpen={isCostCalculatorOpen}
           onClose={() => setIsCostCalculatorOpen(false)}
+        />
+      )}
+
+      {/* Roadmap Wizard */}
+      {countryData && (
+        <RoadmapWizard
+          country={countryData}
+          visa={selectedVisa}
+          isOpen={isRoadmapWizardOpen}
+          onClose={() => setIsRoadmapWizardOpen(false)}
         />
       )}
     </AnimatePresence>

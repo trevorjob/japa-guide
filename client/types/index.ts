@@ -241,15 +241,17 @@ export interface ApiError {
 
 // Form Types
 export interface RoadmapFormData {
-  country: number;
-  goal: string;
-  education_level: string;
-  field_of_study: string;
-  years_experience: number;
-  skills: string[];
+  country: string; // Country code like 'USA', 'CAN'
+  visa_type_id?: number;
+  goal: 'study' | 'work' | 'business' | 'family' | 'other';
+  ai_tone: 'helpful' | 'uncle_japa' | 'bestie' | 'strict_officer' | 'hype_man' | 'therapist';
   budget: number;
   target_date: string | null;
-  ai_personality: string;
+  profile: {
+    age?: number;
+    education?: string;
+    experience_years?: number;
+  };
 }
 
 // Auth Types
