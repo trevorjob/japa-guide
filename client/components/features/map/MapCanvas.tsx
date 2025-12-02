@@ -220,12 +220,13 @@ export default function MapCanvas({ selectedCountry, filters }: MapCanvasProps) 
 
         svg.call(zoom as any);
 
-        // Zoom to selected country
+        // Zoom to selected country if one is selected
         if (selectedCountry) {
-          const selectedFeature = countries.features.find((f: any) => 
-            f.id === selectedCountry || 
-            f.properties.name?.toLowerCase().replace(/\s+/g, '-') === selectedCountry
-          );
+          const selectedCode = selectedCountry.toUpperCase();
+          const selectedFeature = countries.features.find((f: any) => {
+            const isoCode = getISOCodeFromId(f.id);
+            return isoCode === selectedCode;
+          });
 
           if (selectedFeature) {
             const bounds = path.bounds(selectedFeature);
@@ -243,16 +244,24 @@ export default function MapCanvas({ selectedCountry, filters }: MapCanvasProps) 
                 d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale)
               );
 
-            // Dim other countries
+            // Dim other countries and highlight selected
             g.selectAll('path')
               .transition()
               .duration(300)
               .style('opacity', (d: any) => {
-                const isSelected = d.id === selectedCountry || 
-                  d.properties.name?.toLowerCase().replace(/\s+/g, '-') === selectedCountry;
-                return isSelected ? 1 : 0.3;
+                const isoCode = getISOCodeFromId(d.id);
+                return isoCode === selectedCode ? 1 : 0.3;
+              })
+              .attr('stroke-width', (d: any) => {
+                const isoCode = getISOCodeFromId(d.id);
+                return isoCode === selectedCode ? 2 : 0.5;
               });
           }
+        } else {
+          // Reset opacity and stroke when no country selected
+          g.selectAll('path')
+            .style('opacity', 1)
+            .attr('stroke-width', 0.5);
         }
       })
       .catch(error => {
