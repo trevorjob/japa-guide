@@ -41,14 +41,18 @@ export interface VisaType {
   country: number;
   name: string;
   description: string;
+  category?: string;
   processing_time_min: number;
   processing_time_max: number;
+  duration_months?: number | null;
   cost: number;
-  success_rate: number;
-  requirements: string[];
-  restrictions: string[];
-  benefits: string[];
+  cost_usd?: string;
+  success_rate: number | null;
+  requirements: string | string[];
+  restrictions: string | string[];
+  benefits: string | string[];
   is_popular: boolean;
+  is_renewable?: boolean;
   created_at: string;
   updated_at: string;
 }

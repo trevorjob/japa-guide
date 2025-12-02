@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { countryService, visaService } from '@/lib/services';
 import type { Country, VisaType } from '@/types';
 import { Spinner } from '@/components/ui/Loading';
+import VisaRouteModal from '@/components/features/visa/VisaRouteModal';
 
 interface CountryDrawerProps {
   countryCode: string;
@@ -18,12 +19,8 @@ export default function CountryDrawer({ countryCode, isOpen }: CountryDrawerProp
   const [visaRoutes, setVisaRoutes] = useState<VisaType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (isOpen && countryCode) {
-      fetchCountryData();
-    }
-  }, [countryCode, isOpen]);
+  const [selectedVisa, setSelectedVisa] = useState<VisaType | null>(null);
+  const [isVisaModalOpen, setIsVisaModalOpen] = useState(false);
 
   const fetchCountryData = async () => {
     try {
@@ -51,12 +48,23 @@ export default function CountryDrawer({ countryCode, isOpen }: CountryDrawerProp
     }
   };
 
+  useEffect(() => {
+    if (isOpen && countryCode) {
+      fetchCountryData();
+    }
+  }, [countryCode, isOpen]);
+
   const handleClose = () => {
     router.push('/explore');
   };
 
   const handleAction = (action: string) => {
     router.push(`/explore?country=${countryCode}&action=${action}`);
+  };
+
+  const handleVisaClick = (visa: VisaType) => {
+    setSelectedVisa(visa);
+    setIsVisaModalOpen(true);
   };
 
   const getDifficultyLabel = (score: number | null) => {
@@ -249,7 +257,8 @@ export default function CountryDrawer({ countryCode, isOpen }: CountryDrawerProp
                       {visaRoutes.slice(0, 5).map((visa) => (
                         <button
                           key={visa.id}
-                          className="w-full text-left p-3 rounded-lg border border-bg-tertiary dark:border-dark-bg-tertiary hover:border-accent-primary hover:bg-accent-primary/5 transition-colors"
+                          onClick={() => handleVisaClick(visa)}
+                          className="w-full text-left p-3 rounded-lg border border-bg-tertiary dark:border-dark-bg-tertiary hover:border-accent-primary hover:bg-accent-primary/5 transition-colors group"
                         >
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex items-start gap-2 flex-1">
@@ -263,11 +272,16 @@ export default function CountryDrawer({ countryCode, isOpen }: CountryDrawerProp
                                 )}
                               </div>
                             </div>
-                            {visa.success_rate && (
-                              <span className="text-xs font-medium text-green-500">
-                                {visa.success_rate}% success
-                              </span>
-                            )}
+                            <div className="flex items-center gap-2">
+                              {visa.success_rate && (
+                                <span className="text-xs font-medium text-green-500">
+                                  {visa.success_rate}% success
+                                </span>
+                              )}
+                              <svg className="w-4 h-4 text-text-tertiary group-hover:text-accent-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                              </svg>
+                            </div>
                           </div>
                         </button>
                       ))}
@@ -314,6 +328,13 @@ export default function CountryDrawer({ countryCode, isOpen }: CountryDrawerProp
           </motion.div>
         </>
       )}
+
+      {/* Visa Route Modal */}
+      <VisaRouteModal
+        visa={selectedVisa}
+        isOpen={isVisaModalOpen}
+        onClose={() => setIsVisaModalOpen(false)}
+      />
     </AnimatePresence>
   );
 }

@@ -18,7 +18,12 @@ class VisaTypeViewSet(viewsets.ReadOnlyModelViewSet):
     
     def get_queryset(self):
         queryset = super().get_queryset()
-        country = self.request.query_params.get('country')
-        if country:
-            queryset = queryset.filter(country__code=country)
+        country_code = self.request.query_params.get('country')
+        country_id = self.request.query_params.get('country_id')
+        
+        if country_code:
+            queryset = queryset.filter(country__code=country_code.upper())
+        elif country_id:
+            queryset = queryset.filter(country__id=country_id)
+        
         return queryset

@@ -13,9 +13,11 @@ class VisaType(models.Model):
     )
     name = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255)
+    category = models.CharField(max_length=100, null=True, blank=True)
     description = models.TextField()
     processing_time_min_weeks = models.IntegerField(null=True, blank=True)
     processing_time_max_weeks = models.IntegerField(null=True, blank=True)
+    duration_months = models.IntegerField(null=True, blank=True, help_text="Duration of stay allowed in months")
     cost_estimate_min = models.DecimalField(
         max_digits=10, 
         decimal_places=2, 
@@ -28,7 +30,12 @@ class VisaType(models.Model):
         null=True, 
         blank=True
     )
+    success_rate = models.IntegerField(null=True, blank=True, help_text="Success rate percentage (0-100)")
     requirements = models.JSONField(default=list, blank=True)
+    benefits = models.JSONField(default=list, blank=True)
+    restrictions = models.JSONField(default=list, blank=True)
+    is_popular = models.BooleanField(default=False)
+    is_renewable = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

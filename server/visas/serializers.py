@@ -31,12 +31,24 @@ class VisaTypeDetailSerializer(serializers.ModelSerializer):
     steps = VisaStepSerializer(many=True, read_only=True)
     country_name = serializers.CharField(source='country.name', read_only=True)
     country_code = serializers.CharField(source='country.code', read_only=True)
+    # Map backend field names to frontend expectations
+    processing_time_min = serializers.IntegerField(source='processing_time_min_weeks', read_only=True)
+    processing_time_max = serializers.IntegerField(source='processing_time_max_weeks', read_only=True)
+    cost = serializers.DecimalField(source='cost_estimate_min', max_digits=10, decimal_places=2, read_only=True)
+    cost_usd = serializers.SerializerMethodField()
+    
+    def get_cost_usd(self, obj):
+        """Return cost as string for USD display."""
+        if obj.cost_estimate_min:
+            return str(obj.cost_estimate_min)
+        return None
     
     class Meta:
         model = VisaType
         fields = [
-            'id', 'name', 'slug', 'description', 'country_name', 'country_code',
-            'processing_time_min_weeks', 'processing_time_max_weeks',
-            'cost_estimate_min', 'cost_estimate_max', 'requirements',
-            'steps', 'is_active', 'created_at', 'updated_at'
+            'id', 'name', 'slug', 'category', 'description', 'country', 'country_name', 'country_code',
+            'processing_time_min', 'processing_time_max', 'processing_time_min_weeks', 'processing_time_max_weeks',
+            'duration_months', 'cost', 'cost_usd', 'cost_estimate_min', 'cost_estimate_max',
+            'success_rate', 'requirements', 'benefits', 'restrictions',
+            'is_popular', 'is_renewable', 'steps', 'is_active', 'created_at', 'updated_at'
         ]
