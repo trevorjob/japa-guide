@@ -198,9 +198,10 @@ cloudinary.config(
     secure=True
 )
 
-# OpenAI Configuration
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
-OPENAI_MODEL = 'gpt-4o-mini'
+# DeepSeek AI Configuration
+DEEPSEEK_API_KEY = os.getenv('DEEPSEEK_API_KEY', '')
+DEEPSEEK_MODEL = os.getenv('DEEPSEEK_MODEL', 'deepseek-chat')  # or 'deepseek-reasoner'
+DEEPSEEK_BASE_URL = 'https://api.deepseek.com'
 
 # Logging
 LOGGING = {

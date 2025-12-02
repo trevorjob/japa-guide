@@ -8,7 +8,7 @@ from decimal import Decimal
 from jinja2 import Template
 from django.conf import settings
 from django.core.cache import cache
-from openai import OpenAI
+from openai import OpenAI  # DeepSeek uses OpenAI-compatible API
 from .models import PromptTemplate, AIRequest
 
 
@@ -38,8 +38,12 @@ class AIService:
     """
     
     def __init__(self):
-        self.client = OpenAI(api_key=settings.OPENAI_API_KEY) if settings.OPENAI_API_KEY else None
-        self.model = settings.OPENAI_MODEL
+        # DeepSeek uses OpenAI-compatible API
+        self.client = OpenAI(
+            api_key=settings.DEEPSEEK_API_KEY,
+            base_url=settings.DEEPSEEK_BASE_URL
+        ) if settings.DEEPSEEK_API_KEY else None
+        self.model = settings.DEEPSEEK_MODEL
     
     def _render_prompt(self, template_text, context):
         """Render Jinja2 template with context."""
@@ -52,10 +56,10 @@ class AIService:
         return f"ai:completion:{prompt_hash}"
     
     def _calculate_cost(self, tokens_used):
-        """Calculate approximate cost based on tokens (gpt-4o-mini pricing)."""
-        # gpt-4o-mini: ~$0.15 per 1M input tokens, ~$0.60 per 1M output tokens
-        # Simplified: average ~$0.40 per 1M tokens
-        return Decimal(tokens_used * 0.0000004)
+        """Calculate approximate cost based on tokens (DeepSeek pricing)."""
+        # DeepSeek: ~$0.14 per 1M input tokens, ~$0.28 per 1M output tokens
+        # Simplified: average ~$0.21 per 1M tokens (much cheaper than OpenAI!)
+        return Decimal(tokens_used * 0.00000021)
     
     def complete(self, template_name=None, template_text=None, context=None, 
                  use_cache=True, session_id=None, user=None):
@@ -75,7 +79,7 @@ class AIService:
         """
         if not self.client:
             return {
-                'error': 'OpenAI API key not configured',
+                'error': 'DeepSeek API key not configured',
                 'answer': 'AI service is currently unavailable.',
                 'cached': False
             }

@@ -26,7 +26,14 @@ def chat(request):
         user=user
     )
     
-    return Response(result)
+    # Transform response to match frontend ChatResponse interface
+    response_data = {
+        'response': result.get('answer', 'Sorry, I encountered an error.'),
+        'conversation_id': data.get('conversation_id', 1),
+        'tone': data.get('tone', 'helpful')
+    }
+    
+    return Response(response_data)
 
 
 @api_view(['POST'])

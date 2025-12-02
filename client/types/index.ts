@@ -195,7 +195,25 @@ export interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
   content: string;
-  timestamp: Date;
+  timestamp: string;
+  conversationId?: number;
+}
+
+export interface ChatRequest {
+  message: string;
+  tone?: string;
+  context?: {
+    country?: string;
+    visa_type?: string;
+    roadmap_id?: number;
+  };
+  conversation_id?: number;
+}
+
+export interface ChatResponse {
+  response: string;
+  conversation_id: number;
+  tone: string;
 }
 
 export interface Story {
