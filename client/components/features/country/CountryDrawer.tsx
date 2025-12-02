@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { countryService, visaService } from '@/lib/services';
 import type { Country, VisaType } from '@/types';
 import { Spinner } from '@/components/ui/Loading';
 import VisaRouteModal from '@/components/features/visa/VisaRouteModal';
+import CostCalculator from '@/components/features/calculator/CostCalculator';
 
 interface CountryDrawerProps {
   countryCode: string;
@@ -21,8 +22,9 @@ export default function CountryDrawer({ countryCode, isOpen }: CountryDrawerProp
   const [error, setError] = useState<string | null>(null);
   const [selectedVisa, setSelectedVisa] = useState<VisaType | null>(null);
   const [isVisaModalOpen, setIsVisaModalOpen] = useState(false);
+  const [isCostCalculatorOpen, setIsCostCalculatorOpen] = useState(false);
 
-  const fetchCountryData = async () => {
+  const fetchCountryData = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -46,20 +48,24 @@ export default function CountryDrawer({ countryCode, isOpen }: CountryDrawerProp
       setError('Failed to load country data');
       setLoading(false);
     }
-  };
+  }, [countryCode]);
 
   useEffect(() => {
     if (isOpen && countryCode) {
       fetchCountryData();
     }
-  }, [countryCode, isOpen]);
+  }, [countryCode, isOpen, fetchCountryData]);
 
   const handleClose = () => {
     router.push('/explore');
   };
 
   const handleAction = (action: string) => {
-    router.push(`/explore?country=${countryCode}&action=${action}`);
+    if (action === 'calculate') {
+      setIsCostCalculatorOpen(true);
+    } else {
+      router.push(`/explore?country=${countryCode}&action=${action}`);
+    }
   };
 
   const handleVisaClick = (visa: VisaType) => {
@@ -335,6 +341,15 @@ export default function CountryDrawer({ countryCode, isOpen }: CountryDrawerProp
         isOpen={isVisaModalOpen}
         onClose={() => setIsVisaModalOpen(false)}
       />
+
+      {/* Cost Calculator */}
+      {countryData && (
+        <CostCalculator
+          country={countryData}
+          isOpen={isCostCalculatorOpen}
+          onClose={() => setIsCostCalculatorOpen(false)}
+        />
+      )}
     </AnimatePresence>
   );
 }
