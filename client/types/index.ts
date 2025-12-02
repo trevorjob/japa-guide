@@ -1,0 +1,268 @@
+// Core Types matching backend models
+
+// Country List (for map view)
+export interface CountryListData {
+  id: number;
+  code: string;
+  name: string;
+  region: string;
+  currency: string;
+  flag_image: string | null;
+  cost_of_living_index: number | null;
+  difficulty_score: number | null;
+  population: number | null;
+}
+
+// Country Detail (full data)
+export interface Country {
+  id: number;
+  code: string;
+  name: string;
+  region: string;
+  currency: string;
+  population: number | null;
+  flag_image: string | null;
+  hero_image: string | null;
+  summary: string;
+  cost_of_living_index: number | null;
+  difficulty_score: number | null;
+  avg_rent_monthly_usd: string | null;
+  avg_meal_cost_usd: string | null;
+  healthcare_monthly_usd: string | null;
+  metadata: Record<string, any>;
+  visa_types_count?: number;
+  created_at: string;
+  updated_at: string;
+  updated_at: string;
+}
+
+export interface VisaType {
+  id: number;
+  country: number;
+  name: string;
+  description: string;
+  processing_time_min: number;
+  processing_time_max: number;
+  cost: number;
+  success_rate: number;
+  requirements: string[];
+  restrictions: string[];
+  benefits: string[];
+  is_popular: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface VisaStep {
+  id: number;
+  visa_type: number;
+  order: number;
+  title: string;
+  description: string;
+  estimated_time: string;
+  required_documents: string[];
+}
+
+export interface User {
+  id: number;
+  email: string;
+  first_name: string;
+  last_name: string;
+  is_verified: boolean;
+  created_at: string;
+}
+
+export interface UserProfile {
+  id: number;
+  user: number;
+  education_level: string;
+  field_of_study: string;
+  years_of_experience: number;
+  skills: string[];
+  budget_usd: number;
+  target_move_date: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Roadmap {
+  id: number;
+  user: number | null;
+  session_id: string;
+  country: number;
+  country_name?: string;
+  visa_type: number | null;
+  goal: string;
+  education_level: string;
+  field_of_study: string;
+  years_experience: number;
+  skills: string[];
+  budget: number;
+  target_date: string | null;
+  ai_personality: string;
+  is_ai_enriched: boolean;
+  created_at: string;
+  updated_at: string;
+  steps: RoadmapStep[];
+}
+
+export interface RoadmapStep {
+  id: number;
+  roadmap: number;
+  order: number;
+  title: string;
+  description: string;
+  estimated_time: string;
+  estimated_cost: number;
+  tips: string[];
+  pitfalls: string[];
+  documents_needed: string[];
+  ai_advice: string | null;
+  created_at: string;
+  updated_at: string;
+  status?: RoadmapStepStatus;
+}
+
+export interface RoadmapStepStatus {
+  id: number;
+  step: number;
+  user: number | null;
+  session_id: string;
+  is_complete: boolean;
+  is_blocked: boolean;
+  block_reason: string | null;
+  notes: string;
+  completed_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CostCalculation {
+  total_cost: number;
+  breakdown: {
+    visa_and_flights: number;
+    tuition: number;
+    housing: number;
+    living_expenses: number;
+    buffer: number;
+  };
+  hidden_costs: Array<{
+    name: string;
+    amount: number;
+    description: string;
+  }>;
+  savings_plan: {
+    monthly_target: number;
+    months_to_save: number;
+  };
+}
+
+export interface AIPersonality {
+  id: string;
+  name: string;
+  emoji: string;
+  description: string;
+  tone: string;
+}
+
+export interface ChatMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+}
+
+export interface Story {
+  id: number;
+  user: number | null;
+  country: number;
+  title: string;
+  content: string;
+  visa_type: string;
+  timeline_months: number;
+  is_moderated: boolean;
+  view_count: number;
+  like_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GeoPoint {
+  id: number;
+  country: number;
+  city: string;
+  latitude: number;
+  longitude: number;
+  type: string;
+  name: string;
+  description: string;
+  metadata: Record<string, any>;
+}
+
+// API Response Types
+export interface PaginatedResponse<T> {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: T[];
+}
+
+export interface ApiError {
+  detail?: string;
+  message?: string;
+  [key: string]: any;
+}
+
+// Form Types
+export interface RoadmapFormData {
+  country: number;
+  goal: string;
+  education_level: string;
+  field_of_study: string;
+  years_experience: number;
+  skills: string[];
+  budget: number;
+  target_date: string | null;
+  ai_personality: string;
+}
+
+export interface CostCalculatorFormData {
+  country: number;
+  duration_months: number;
+  dependents: number;
+  include_tuition: boolean;
+}
+
+// Auth Types
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+export interface RegisterData {
+  email: string;
+  password: string;
+  first_name: string;
+  last_name: string;
+}
+
+export interface AuthTokens {
+  access: string;
+  refresh: string;
+}
+
+export interface SessionStatus {
+  authenticated: boolean;
+  session_id: string | null;
+  roadmap_count: number;
+  can_claim: boolean;
+}
+
+// Filter Types
+export interface CountryFilters {
+  region?: string;
+  difficulty_score?: number;
+  difficulty_score__gte?: number;
+  difficulty_score__lte?: number;
+  search?: string;
+}
