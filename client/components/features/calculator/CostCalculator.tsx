@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import type { Country } from '@/types';
+import type { Country, CostCalculation, CostCalculatorFormData } from '@/types';
+import { countryService } from '@/lib/services';
 
 interface CostCalculatorProps {
   country: Country;
@@ -11,34 +12,13 @@ interface CostCalculatorProps {
   onClose: () => void;
 }
 
-interface FormData {
-  lifestyle: 'budget' | 'moderate' | 'comfortable' | 'luxury';
-  accommodation: 'shared' | 'studio' | 'one_bed' | 'two_bed';
-  dining: 'cook_home' | 'mix' | 'eat_out';
-  transportation: 'public' | 'mix' | 'car';
-  duration_months: number;
-  dependents: number;
-}
-
-interface CostBreakdown {
-  housing: number;
-  food: number;
-  transportation: number;
-  utilities: number;
-  healthcare: number;
-  entertainment: number;
-  visa_fees: number;
-  total_monthly: number;
-  total_cost: number;
-}
-
 export default function CostCalculator({ country, isOpen, onClose }: CostCalculatorProps) {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [calculating, setCalculating] = useState(false);
-  const [results, setResults] = useState<CostBreakdown | null>(null);
+  const [results, setResults] = useState<CostCalculation | null>(null);
   
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<CostCalculatorFormData>({
     lifestyle: 'moderate',
     accommodation: 'studio',
     dining: 'mix',
@@ -47,48 +27,70 @@ export default function CostCalculator({ country, isOpen, onClose }: CostCalcula
     dependents: 0,
   });
 
-  const calculateCosts = () => {
+  const calculateCosts = async () => {
     setCalculating(true);
     
-    // Basic calculation logic (you can enhance this with actual API call)
-    const baseRent = parseFloat(country.avg_rent_monthly_usd || '1000');
-    const baseMeal = parseFloat(country.avg_meal_cost_usd || '15');
-    const baseHealthcare = parseFloat(country.healthcare_monthly_usd || '100');
-    
-    // Adjust based on selections
-    const lifestyleMultipliers = { budget: 0.7, moderate: 1.0, comfortable: 1.4, luxury: 2.0 };
-    const accommodationMultipliers = { shared: 0.5, studio: 1.0, one_bed: 1.3, two_bed: 1.7 };
-    const diningMultipliers = { cook_home: 0.6, mix: 1.0, eat_out: 1.8 };
-    const transportMultipliers = { public: 0.3, mix: 0.6, car: 1.2 };
-    
-    const lifestyleFactor = lifestyleMultipliers[formData.lifestyle];
-    
-    const housing = baseRent * accommodationMultipliers[formData.accommodation] * lifestyleFactor;
-    const food = baseMeal * 30 * diningMultipliers[formData.dining] * lifestyleFactor * (1 + formData.dependents * 0.5);
-    const transportation = 100 * transportMultipliers[formData.transportation] * lifestyleFactor;
-    const utilities = 150 * lifestyleFactor;
-    const healthcare = baseHealthcare * (1 + formData.dependents);
-    const entertainment = 200 * lifestyleFactor;
-    const visa_fees = 500; // Average visa application fee
-    
-    const total_monthly = housing + food + transportation + utilities + healthcare + entertainment;
-    const total_cost = (total_monthly * formData.duration_months) + visa_fees;
-    
-    setTimeout(() => {
-      setResults({
-        housing,
-        food,
-        transportation,
-        utilities,
-        healthcare,
-        entertainment,
-        visa_fees,
-        total_monthly,
-        total_cost,
-      });
-      setCalculating(false);
+    try {
+      // Try to use backend calculation endpoint
+      const result = await countryService.calculateCost(country.code, formData);
+      setResults(result);
       setStep(3);
-    }, 1500);
+    } catch (err) {
+      console.error('Backend calculation failed, using frontend fallback:', err);
+      
+      // Fallback to frontend calculation
+      const baseRent = parseFloat(country.avg_rent_monthly_usd || '1000');
+      const baseMeal = parseFloat(country.avg_meal_cost_usd || '15');
+      const baseHealthcare = parseFloat(country.healthcare_monthly_usd || '100');
+      
+      const lifestyleMultipliers = { budget: 0.7, moderate: 1.0, comfortable: 1.4, luxury: 2.0 };
+      const accommodationMultipliers = { shared: 0.5, studio: 1.0, one_bed: 1.3, two_bed: 1.7 };
+      const diningMultipliers = { cook_home: 0.6, mix: 1.0, eat_out: 1.8 };
+      const transportMultipliers = { public: 0.3, mix: 0.6, car: 1.2 };
+      
+      const lifestyleFactor = lifestyleMultipliers[formData.lifestyle];
+      
+      const housing = baseRent * accommodationMultipliers[formData.accommodation] * lifestyleFactor;
+      const food = baseMeal * 30 * diningMultipliers[formData.dining] * lifestyleFactor * (1 + formData.dependents * 0.5);
+      const transportation = 100 * transportMultipliers[formData.transportation] * lifestyleFactor;
+      const utilities = 150 * lifestyleFactor;
+      const healthcare = baseHealthcare * (1 + formData.dependents);
+      const entertainment = 200 * lifestyleFactor;
+      const visa_fees = 500;
+      
+      const total_monthly = housing + food + transportation + utilities + healthcare + entertainment;
+      const total_cost = (total_monthly * formData.duration_months) + visa_fees;
+      
+      setResults({
+        country: {
+          code: country.code,
+          name: country.name,
+          currency: country.currency,
+        },
+        input: formData,
+        breakdown: {
+          housing,
+          food,
+          transportation,
+          utilities,
+          healthcare,
+          entertainment,
+          visa_fees,
+        },
+        totals: {
+          monthly: total_monthly,
+          total: total_cost,
+          currency: country.currency,
+        },
+        savings_plan: {
+          monthly_savings_needed: total_cost / 12,
+          description: `Save $${(total_cost / 12).toFixed(2)}/month for 12 months to reach your goal`,
+        },
+      });
+      setStep(3);
+    } finally {
+      setCalculating(false);
+    }
   };
 
   const handleNext = () => {
@@ -195,7 +197,7 @@ export default function CostCalculator({ country, isOpen, onClose }: CostCalcula
                           ].map((option) => (
                             <button
                               key={option.value}
-                              onClick={() => setFormData({ ...formData, lifestyle: option.value as FormData['lifestyle'] })}
+                              onClick={() => setFormData({ ...formData, lifestyle: option.value as CostCalculatorFormData['lifestyle'] })}
                               className={`p-4 rounded-xl border-2 transition-all ${
                                 formData.lifestyle === option.value
                                   ? 'border-accent-primary bg-accent-primary/10'
@@ -221,7 +223,7 @@ export default function CostCalculator({ country, isOpen, onClose }: CostCalcula
                           ].map((option) => (
                             <button
                               key={option.value}
-                              onClick={() => setFormData({ ...formData, accommodation: option.value as FormData['accommodation'] })}
+                              onClick={() => setFormData({ ...formData, accommodation: option.value as CostCalculatorFormData['accommodation'] })}
                               className={`p-4 rounded-xl border-2 transition-all ${
                                 formData.accommodation === option.value
                                   ? 'border-accent-primary bg-accent-primary/10'
@@ -257,7 +259,7 @@ export default function CostCalculator({ country, isOpen, onClose }: CostCalcula
                         ].map((option) => (
                           <button
                             key={option.value}
-                            onClick={() => setFormData({ ...formData, dining: option.value as FormData['dining'] })}
+                            onClick={() => setFormData({ ...formData, dining: option.value as CostCalculatorFormData['dining'] })}
                             className={`p-4 rounded-xl border-2 transition-all ${
                               formData.dining === option.value
                                 ? 'border-accent-primary bg-accent-primary/10'
@@ -282,7 +284,7 @@ export default function CostCalculator({ country, isOpen, onClose }: CostCalcula
                         ].map((option) => (
                           <button
                             key={option.value}
-                            onClick={() => setFormData({ ...formData, transportation: option.value as FormData['transportation'] })}
+                            onClick={() => setFormData({ ...formData, transportation: option.value as CostCalculatorFormData['transportation'] })}
                             className={`p-4 rounded-xl border-2 transition-all ${
                               formData.transportation === option.value
                                 ? 'border-accent-primary bg-accent-primary/10'
@@ -346,10 +348,11 @@ export default function CostCalculator({ country, isOpen, onClose }: CostCalcula
                     {/* Total Cost Highlight */}
                     <div className="bg-gradient-to-r from-accent-primary to-accent-secondary p-6 rounded-2xl text-white">
                       <div className="text-sm font-medium opacity-90 mb-1">Estimated Total Cost</div>
-                      <div className="text-4xl font-bold mb-2">${results.total_cost.toLocaleString()}</div>
+                      <div className="text-4xl font-bold mb-2">${results.totals.total.toLocaleString()}</div>
                       <div className="text-sm opacity-90">
-                        ${results.total_monthly.toLocaleString()}/month × {formData.duration_months} months
+                        ${results.totals.monthly.toLocaleString()}/month × {formData.duration_months} months
                       </div>
+                      <div className="text-xs opacity-75 mt-1">Currency: {results.totals.currency}</div>
                     </div>
 
                     {/* Monthly Breakdown */}
@@ -357,12 +360,12 @@ export default function CostCalculator({ country, isOpen, onClose }: CostCalcula
                       <h3 className="text-lg font-semibold text-text-primary mb-4">Monthly Breakdown</h3>
                       <div className="space-y-3">
                         {[
-                          { label: 'Housing', amount: results.housing, icon: '🏠' },
-                          { label: 'Food', amount: results.food, icon: '🍽️' },
-                          { label: 'Transportation', amount: results.transportation, icon: '🚗' },
-                          { label: 'Utilities', amount: results.utilities, icon: '💡' },
-                          { label: 'Healthcare', amount: results.healthcare, icon: '🏥' },
-                          { label: 'Entertainment', amount: results.entertainment, icon: '🎬' },
+                          { label: 'Housing', amount: results.breakdown.housing, icon: '🏠' },
+                          { label: 'Food', amount: results.breakdown.food, icon: '🍽️' },
+                          { label: 'Transportation', amount: results.breakdown.transportation, icon: '🚗' },
+                          { label: 'Utilities', amount: results.breakdown.utilities, icon: '💡' },
+                          { label: 'Healthcare', amount: results.breakdown.healthcare, icon: '🏥' },
+                          { label: 'Entertainment', amount: results.breakdown.entertainment, icon: '🎬' },
                         ].map((item) => (
                           <div key={item.label} className="flex items-center justify-between p-4 bg-bg-secondary dark:bg-dark-bg-secondary rounded-xl">
                             <div className="flex items-center gap-3">
@@ -383,8 +386,17 @@ export default function CostCalculator({ country, isOpen, onClose }: CostCalcula
                           <span className="text-2xl">📄</span>
                           <span className="font-medium text-text-primary">Visa Application Fees</span>
                         </div>
-                        <span className="text-lg font-bold text-text-primary">${results.visa_fees.toLocaleString()}</span>
+                        <span className="text-lg font-bold text-text-primary">${results.breakdown.visa_fees.toLocaleString()}</span>
                       </div>
+                    </div>
+
+                    {/* Savings Plan */}
+                    <div className="p-4 bg-accent-primary/10 rounded-xl border border-accent-primary/20">
+                      <h3 className="text-lg font-semibold text-text-primary mb-2">💡 Savings Plan</h3>
+                      <p className="text-2xl font-bold text-accent-primary mb-1">
+                        ${results.savings_plan.monthly_savings_needed.toLocaleString()}/month
+                      </p>
+                      <p className="text-sm text-text-secondary">{results.savings_plan.description}</p>
                     </div>
                   </motion.div>
                 )}

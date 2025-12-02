@@ -33,7 +33,6 @@ export interface Country {
   visa_types_count?: number;
   created_at: string;
   updated_at: string;
-  updated_at: string;
 }
 
 export interface VisaType {
@@ -142,23 +141,46 @@ export interface RoadmapStepStatus {
 }
 
 export interface CostCalculation {
-  total_cost: number;
-  breakdown: {
-    visa_and_flights: number;
-    tuition: number;
-    housing: number;
-    living_expenses: number;
-    buffer: number;
-  };
-  hidden_costs: Array<{
+  country: {
+    code: string;
     name: string;
-    amount: number;
-    description: string;
-  }>;
-  savings_plan: {
-    monthly_target: number;
-    months_to_save: number;
+    currency: string;
   };
+  input: {
+    lifestyle: string;
+    accommodation: string;
+    dining: string;
+    transportation: string;
+    duration_months: number;
+    dependents: number;
+  };
+  breakdown: {
+    housing: number;
+    food: number;
+    transportation: number;
+    utilities: number;
+    healthcare: number;
+    entertainment: number;
+    visa_fees: number;
+  };
+  totals: {
+    monthly: number;
+    total: number;
+    currency: string;
+  };
+  savings_plan: {
+    monthly_savings_needed: number;
+    description: string;
+  };
+}
+
+export interface CostCalculatorFormData {
+  lifestyle: 'budget' | 'moderate' | 'comfortable' | 'luxury';
+  accommodation: 'shared' | 'studio' | 'one_bed' | 'two_bed';
+  dining: 'cook_home' | 'mix' | 'eat_out';
+  transportation: 'public' | 'mix' | 'car';
+  duration_months: number;
+  dependents: number;
 }
 
 export interface AIPersonality {
@@ -228,13 +250,6 @@ export interface RoadmapFormData {
   budget: number;
   target_date: string | null;
   ai_personality: string;
-}
-
-export interface CostCalculatorFormData {
-  country: number;
-  duration_months: number;
-  dependents: number;
-  include_tuition: boolean;
 }
 
 // Auth Types
