@@ -4,33 +4,79 @@
 export interface CountryListData {
   id: number;
   code: string;
+  code_alpha2: string;
   name: string;
   region: string;
+  subregion?: string;
   currency: string;
   flag_image: string | null;
+  flag_svg_url?: string;
+  flag_png_url?: string;
   cost_of_living_index: number | null;
   difficulty_score: number | null;
   population: number | null;
+  data_quality_score?: number;
+  is_featured?: boolean;
 }
 
 // Country Detail (full data)
 export interface Country {
+  // Basic Info
   id: number;
   code: string;
+  code_alpha2: string;
   name: string;
   region: string;
+  subregion?: string;
   currency: string;
   population: number | null;
+  area_sq_km?: number | null;
   flag_image: string | null;
+  flag_svg_url?: string;
+  flag_png_url?: string;
   hero_image: string | null;
   summary: string;
+  
+  // Cost & Difficulty
   cost_of_living_index: number | null;
   difficulty_score: number | null;
   avg_rent_monthly_usd: string | null;
   avg_meal_cost_usd: string | null;
   healthcare_monthly_usd: string | null;
-  metadata: Record<string, any>;
+  cpi_annual_change?: number | null;
+  ppp_conversion_factor?: number | null;
+  
+  // Migration Metrics (from UNHCR)
+  refugees_in?: number | null;
+  refugees_out?: number | null;
+  asylum_seekers?: number | null;
+  net_migration?: number | null;
+  idp_count?: number | null;
+  
+  // Economic Indicators (from World Bank)
+  gdp_per_capita_usd?: number | null;
+  unemployment_rate?: number | null;
+  life_expectancy?: number | null;
+  literacy_rate?: number | null;
+  
+  // Visa Info
+  visa_summary?: string;
   visa_types_count?: number;
+  visa_last_reviewed?: string | null;
+  
+  // Data Quality & Tracking
+  data_quality_score?: number;
+  needs_review?: boolean;
+  is_featured?: boolean;
+  basic_data_source?: string;
+  basic_data_last_synced?: string | null;
+  migration_data_source?: string;
+  migration_data_last_synced?: string | null;
+  economic_data_source?: string;
+  economic_data_last_synced?: string | null;
+  
+  // Metadata & Timestamps
+  metadata: Record<string, any>;
   created_at: string;
   updated_at: string;
 }

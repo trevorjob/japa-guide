@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface MapFiltersProps {
@@ -15,10 +15,25 @@ export interface FilterState {
 }
 
 export default function MapFilters({ onFilterChange }: MapFiltersProps) {
-  const [isExpanded, setIsExpanded] = useState(true);
+  const [isExpanded, setIsExpanded] = useState(false);
   const [selectedRegion, setSelectedRegion] = useState<string>('');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
+
+  // Load expanded state from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('mapFiltersExpanded');
+    if (saved !== null) {
+      setIsExpanded(saved === 'true');
+    }
+  }, []);
+
+  // Save expanded state to localStorage
+  const toggleExpanded = () => {
+    const newState = !isExpanded;
+    setIsExpanded(newState);
+    localStorage.setItem('mapFiltersExpanded', String(newState));
+  };
 
   const regions = [
     { value: '', label: 'All Regions' },
@@ -80,31 +95,33 @@ export default function MapFilters({ onFilterChange }: MapFiltersProps) {
   const activeFiltersCount = (selectedRegion ? 1 : 0) + (selectedDifficulty !== 'all' ? 1 : 0) + (searchQuery ? 1 : 0);
 
   return (
-    <div className="fixed bottom-6 left-6 z-30">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="glass rounded-2xl shadow-float overflow-hidden"
-        style={{ minWidth: '280px', maxWidth: '320px' }}
+        className="bg-card-background/60 backdrop-blur-lg rounded-2xl shadow-float overflow-hidden fixed bottom-6 left-6 z-30 border border-white/10"
+        style={{maxWidth:"280px",  minWidth: '240px', padding: isExpanded ? '12px' : '8px' }}
       >
         {/* Header */}
-        <div className="p-4 border-b border-white/10">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="text-lg font-semibold">Filters</span>
+        {/* <div className="border-b border-white/10"> */}
+          <div className="flex items-center justify-between" style={{ marginBottom: isExpanded ? '12px' : '0' }}>
+            <div className="flex items-center gap-1">
+              <svg className="w-3 h-3 text-accent-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+              </svg>
+              <span className="text-sm font-semibold">Filters</span>
               {activeFiltersCount > 0 && (
-                <span className="px-2 py-0.5 text-xs font-medium bg-[var(--accent-primary)] text-white rounded-full">
+                <span className="px-2 py-0.5 text-xs font-medium bg-accent-primary text-white rounded-full">
                   {activeFiltersCount}
                 </span>
               )}
             </div>
             <button
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="p-1 hover:bg-white/10 rounded-lg transition-colors"
+              onClick={toggleExpanded}
+              className="p-1 hover:bg-white/10 rounded-lg transition-colors focus:outline-none"
               aria-label={isExpanded ? 'Collapse filters' : 'Expand filters'}
             >
               <svg
-                className={`w-5 h-5 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -113,7 +130,7 @@ export default function MapFilters({ onFilterChange }: MapFiltersProps) {
               </svg>
             </button>
           </div>
-        </div>
+        {/* </div> */}
 
         {/* Filter Content */}
         <AnimatePresence>
@@ -125,17 +142,16 @@ export default function MapFilters({ onFilterChange }: MapFiltersProps) {
               transition={{ duration: 0.2 }}
               className="overflow-hidden"
             >
-              <div className="p-4 space-y-4">
-                {/* Search Filter */}
+              <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Search Country</label>
+                  <label className="text-sm font-medium mb-2 block">Search Country</label>
                   <div className="relative">
                     <input
                       type="text"
                       value={searchQuery}
                       onChange={(e) => handleSearchChange(e.target.value)}
                       placeholder="Type country name..."
-                      className="w-full px-3 py-2 pl-9 pr-9 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-transparent transition-all placeholder:text-white/40"
+                      className="w-full px-3 py-1 pl-9 pr-9 bg-white/5 border border-white/10 rounded-lg placeholder:text-white/40 focus:outline-none focus:border-white/20 transition-colors"
                     />
                     <svg
                       className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40"
@@ -159,30 +175,38 @@ export default function MapFilters({ onFilterChange }: MapFiltersProps) {
                   </div>
                 </div>
 
-                {/* Region Filter */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">Region</label>
-                  <select
-                    value={selectedRegion}
-                    onChange={(e) => handleRegionChange(e.target.value)}
-                    className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg focus:ring-2 focus:ring-[var(--accent-primary)] focus:border-transparent transition-all"
-                  >
-                    {regions.map((region) => (
-                      <option key={region.value} value={region.value}>
-                        {region.label}
-                      </option>
-                    ))}
-                  </select>
+                  <label className="text-sm font-medium mb-2 block">Region</label>
+                  <div className="relative">
+                    <select
+                      value={selectedRegion}
+                      onChange={(e) => handleRegionChange(e.target.value)}
+                      className="w-full px-3 py-2 pr-8 bg-white/5 border border-white/10 rounded-lg focus:outline-none focus:border-white/20 transition-all text-sm cursor-pointer hover:bg-white/10 appearance-none"
+                    >
+                      {regions.map((region) => (
+                        <option key={region.value} value={region.value} className="bg-bg-secondary text-white">
+                          {region.label}
+                        </option>
+                      ))}
+                    </select>
+                    <svg
+                      className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 pointer-events-none"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </div>
                 </div>
 
-                {/* Difficulty Filter */}
                 <div>
-                  <label className="block text-sm font-medium mb-2">Difficulty</label>
-                  <div className="space-y-2">
+                  <label className="text-sm font-medium mb-2 block">Difficulty</label>
+                  <div className="space-y-1">
                     {difficulties.map((difficulty) => (
                       <label
                         key={difficulty.value}
-                        className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-colors"
+                        className="flex items-center gap-3 px-3 py-1 rounded-lg hover:bg-white/5 cursor-pointer transition-colors group"
                       >
                         <input
                           type="radio"
@@ -190,21 +214,25 @@ export default function MapFilters({ onFilterChange }: MapFiltersProps) {
                           value={difficulty.value}
                           checked={selectedDifficulty === difficulty.value}
                           onChange={(e) => handleDifficultyChange(e.target.value)}
-                          className="w-4 h-4 accent-[var(--accent-primary)]"
+                          className="w-4 h-4 accent-accent-primary cursor-pointer"
                         />
-                        <span className="text-sm">{difficulty.label}</span>
+                        <span className="text-sm group-hover:text-white transition-colors">{difficulty.label}</span>
                       </label>
                     ))}
                   </div>
                 </div>
 
-                {/* Reset Button */}
                 {activeFiltersCount > 0 && (
                   <button
                     onClick={handleReset}
-                    className="w-full py-2 px-4 text-sm font-medium text-[var(--accent-primary)] border border-[var(--accent-primary)] rounded-lg hover:bg-[var(--accent-primary)]/10 transition-colors"
+                    className="w-full py-2 px-4 text-sm font-medium text-accent-primary border border-accent-primary/50 rounded-lg hover:bg-accent-primary/10 hover:border-accent-primary transition-all hover:scale-[1.02] focus:outline-none"
                   >
-                    Reset Filters
+                    <span className="flex items-center justify-center gap-2">
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                      Reset Filters
+                    </span>
                   </button>
                 )}
               </div>
@@ -212,6 +240,6 @@ export default function MapFilters({ onFilterChange }: MapFiltersProps) {
           )}
         </AnimatePresence>
       </motion.div>
-    </div>
+    // </div>
   );
 }

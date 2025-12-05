@@ -19,6 +19,7 @@ export default function VisaRouteModal({ visa, isOpen, onClose, onGenerateRoadma
         <>
           {/* Backdrop */}
           <motion.div
+            key="visa-modal-backdrop"
             className="fixed inset-0 bg-overlay-dim z-40"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -28,14 +29,15 @@ export default function VisaRouteModal({ visa, isOpen, onClose, onGenerateRoadma
 
           {/* Modal */}
           <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            key="visa-modal"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{ duration: 0.2 }}
           >
             <div
-              className="relative w-full max-w-2xl max-h-[85vh] bg-bg-primary dark:bg-dark-bg-primary rounded-2xl shadow-float overflow-hidden"
+              className="relative w-full max-h-[100vh] bg-bg-primary dark:bg-dark-bg-primary rounded-2xl shadow-float overflow-hidden flex flex-col pointer-events-auto"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}

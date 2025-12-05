@@ -99,7 +99,7 @@ class Command(BaseCommand):
                     country, created = Country.objects.update_or_create(
                         code=code,
                         defaults={
-                            'code_alpha2': data.get('alpha2Code', ''),
+                            'code_alpha2': data.get('cca2', ''),
                             'name': name,
                             'region': region,
                             'subregion': subregion,

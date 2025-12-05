@@ -124,6 +124,7 @@ export default function CostCalculator({ country, isOpen, onClose }: CostCalcula
         <>
           {/* Backdrop */}
           <motion.div
+            key="cost-calculator-backdrop"
             className="fixed inset-0 bg-overlay-dim z-40"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -133,14 +134,15 @@ export default function CostCalculator({ country, isOpen, onClose }: CostCalcula
 
           {/* Modal */}
           <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
+            key="cost-calculator-modal"
+            className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{ duration: 0.2 }}
           >
             <div
-              className="relative w-full max-w-3xl max-h-[90vh] bg-bg-primary dark:bg-dark-bg-primary rounded-2xl shadow-float overflow-hidden"
+              className="relative w-full max-h-[100vh] bg-bg-primary dark:bg-dark-bg-primary rounded-2xl shadow-float overflow-hidden flex flex-col pointer-events-auto"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
