@@ -412,6 +412,33 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
 
         svg.call(zoom as any);
 
+        // Add country labels for mobile on filtered countries
+        if (isMobile && hasActiveFilter && filteredCountryCodes.size > 0) {
+          g.selectAll('text')
+            .data(countries.features.filter((d: any) => {
+              const alpha2 = numericToAlpha2[d.id];
+              return alpha2 && filteredCountryCodes.has(alpha2);
+            }))
+            .join('text')
+            .attr('class', 'country-label')
+            .attr('transform', (d: any) => {
+              const centroid = path.centroid(d);
+              return `translate(${centroid})`;
+            })
+            .attr('text-anchor', 'middle')
+            .attr('dy', '.35em')
+            .style('font-size', '6px')
+            .style('font-weight', '400')
+            .style('fill', '#ffffff')
+            .style('pointer-events', 'none')
+            .style('text-shadow', '0 1px 3px rgba(0,0,0,0.8), 0 0 5px rgba(0,0,0,0.5)')
+            .text((d: any) => {
+              const alpha2 = numericToAlpha2[d.id];
+              const countryData = alpha2 ? countryDataByAlpha2.get(alpha2) : null;
+              return countryData?.name || '';
+            });
+        }
+
         // Zoom to selected country if one is selected
         if (selectedCountry) {
           const selectedCode = selectedCountry.toUpperCase();

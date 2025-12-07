@@ -202,7 +202,7 @@ export default function ChatPanel({ onClose }: { onClose?: () => void }) {
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
       >
-        💬
+        <img width="32" height="32" src="https://img.icons8.com/liquid-glass-color/32/sms.png" alt="sms"/>
       </motion.button>
     );
   }

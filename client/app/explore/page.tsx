@@ -3,6 +3,7 @@
 import React, { Suspense, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { Spinner } from '@/components/ui/Loading';
+import GlassButton from '@/components/ui/GlassButton';
 
 // Lazy load heavy components
 const MapCanvas = dynamic(() => import('@/components/features/map/MapCanvas'), {
@@ -129,11 +130,12 @@ function MapPageContent() {
 
       {/* Floating Chat Bubble (when not open) */}
       {!chatOpen && (
+    
         <button
           onClick={handleChatOpen}
-          className="fixed bottom-8 right-8 z-40 w-16 h-16 bg-linear-to-r from-[var(--accent-primary)] to-[var(--accent-secondary)] rounded-full shadow-float flex items-center justify-center text-white text-2xl hover:scale-110 transition-transform"
+          className="fixed bottom-8 right-8 z-40 w-16 h-16 glass rounded-full shadow-float flex items-center justify-center text-white text-2xl hover:scale-110 transition-transform"
         >
-          💬
+          <img width="32" height="32" src="https://img.icons8.com/liquid-glass-color/32/sms.png" alt="sms"/>
         </button>
       )}
     </div>
