@@ -11,6 +11,70 @@ from countries.models import Country
 class Command(BaseCommand):
     help = 'Sync country data from REST Countries API (https://restcountries.com/)'
 
+    def calculate_difficulty_score(self, country_data, region):
+        """
+        Calculate migration difficulty score (1-10) based on multiple factors.
+        Higher score = more competitive/harder to get in (high demand, strict policies)
+        Lower score = less competitive/easier to get in (lower demand, more accessible)
+        """
+        score = 5  # Base score
+        
+        # Factor 1: Region desirability & visa strictness
+        region_scores = {
+            'Europe': 7,      # High demand (Schengen), strict quotas, language barriers
+            'Americas': 6,    # Very competitive (USA, Canada), long wait times
+            'Asia': 5,        # Mixed - some very hard (Japan, Singapore), some easier
+            'Africa': 3,      # Generally less competitive, more opportunities
+            'Oceania': 7,     # Very competitive (AU, NZ) - points systems, quotas
+        }
+        score = region_scores.get(region, 5)
+        
+        # Factor 2: Economic powerhouse = higher competition
+        population = country_data.get('population', 0)
+        if population > 100_000_000:
+            score += 2  # Major countries (USA, etc.) = massive competition
+        elif population > 50_000_000:
+            score += 1  # Large countries = high demand
+        elif population < 1_000_000:
+            score -= 1  # Small countries = niche, often easier entry
+        
+        # Factor 3: English-speaking = MORE competitive (everyone wants to go there)
+        languages = country_data.get('languages', {})
+        if languages:
+            lang_values = [str(v).lower() for v in languages.values()]
+            if 'english' in lang_values:
+                score += 2  # USA, UK, Canada, Australia = very high competition
+        
+        # Factor 4: Developed regions = stricter (proxy check)
+        name = country_data.get('name', {}).get('common', '').upper()
+        high_demand_countries = [
+            'UNITED STATES', 'CANADA', 'UNITED KINGDOM', 'AUSTRALIA', 
+            'NEW ZEALAND', 'GERMANY', 'FRANCE', 'JAPAN', 'SINGAPORE',
+            'SWITZERLAND', 'NORWAY', 'SWEDEN', 'DENMARK', 'NETHERLANDS'
+        ]
+        if any(hdc in name for hdc in high_demand_countries):
+            score += 2  # Top destinations = extremely competitive
+        
+        # Factor 5: Island nations in desirable regions = selective
+        borders = country_data.get('borders', [])
+        if len(borders) == 0 and region in ['Oceania', 'Americas', 'Europe']:
+            score += 1  # Islands are often more selective
+        elif len(borders) > 5:
+            score -= 0.5  # Well-connected = more regional mobility options
+        
+        # Factor 6: UN membership (stability indicator)
+        if country_data.get('unMember', False):
+            score += 0.5  # Stable countries = more desirable = more competitive
+        
+        # Factor 7: Dependencies often have restricted access
+        if not country_data.get('independent', False):
+            score += 1  # Territories have complex visa rules
+        
+        # Ensure score stays within 1-10 range
+        score = max(1, min(10, round(score)))
+        
+        return int(score)
+
     def add_arguments(self, parser):
         parser.add_argument(
             '--limit',
@@ -95,6 +159,9 @@ class Command(BaseCommand):
                         'continents': data.get('continents', []),
                     }
                     
+                    # Calculate difficulty score (1-10) based on available data
+                    difficulty_score = self.calculate_difficulty_score(data, region)
+                    
                     # Check if country exists
                     country, created = Country.objects.update_or_create(
                         code=code,
@@ -109,6 +176,7 @@ class Command(BaseCommand):
                             'flag_svg_url': flag_svg,
                             'flag_png_url': flag_png,
                             'metadata': metadata,
+                            'difficulty_score': difficulty_score,
                             'basic_data_source': 'rest_countries',
                             'basic_data_last_synced': timezone.now(),
                         }

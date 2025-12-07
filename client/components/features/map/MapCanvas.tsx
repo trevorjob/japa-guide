@@ -61,11 +61,8 @@ export default function MapCanvas({ selectedCountry, filters }: MapCanvasProps) 
         }
         
         const response = await countryService.getAll(params);
-        // Handle both paginated and direct array responses
-        const data = response.results || response;
-        const countriesArray = Array.isArray(data) ? data : [];
-        console.log(`Loaded ${countriesArray.length} countries from API`);
-        setCountriesData(countriesArray);
+        console.log(`Loaded ${response.length} countries from API`);
+        setCountriesData(response);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching countries:', error);

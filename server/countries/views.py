@@ -29,6 +29,7 @@ class CountryViewSet(viewsets.ReadOnlyModelViewSet):
     search_fields = ['name', 'code']
     ordering_fields = ['name', 'difficulty_score', 'cost_of_living_index']
     lookup_field = 'code'
+    pagination_class = None  # Disable pagination - return all countries
     
     def get_serializer_class(self):
         if self.action == 'retrieve':
