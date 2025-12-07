@@ -17,9 +17,12 @@ interface MapCanvasProps {
     difficulty_max?: number;
     search?: string;
   };
+  selectedRegion?: string | null;
+  onCountrySelect?: (code: string) => void;
+  onResultsUpdate?: (count: number, countries: string[]) => void;
 }
 
-export default function MapCanvas({ selectedCountry, filters }: MapCanvasProps) {
+export default function MapCanvas({ selectedCountry, filters, selectedRegion, onCountrySelect, onResultsUpdate }: MapCanvasProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -29,6 +32,7 @@ export default function MapCanvas({ selectedCountry, filters }: MapCanvasProps) 
   const [countriesData, setCountriesData] = useState<CountryListData[]>([]);
   const [loading, setLoading] = useState(true);
   const [highlightedCountry, setHighlightedCountry] = useState<string | null>(null);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   // Clear highlighted country when navigating away
   useEffect(() => {
@@ -63,6 +67,12 @@ export default function MapCanvas({ selectedCountry, filters }: MapCanvasProps) 
         const response = await countryService.getAll(params);
         console.log(`Loaded ${response.length} countries from API`);
         setCountriesData(response);
+        
+        // Notify parent of results
+        if (onResultsUpdate) {
+          onResultsUpdate(response.length, response.map(c => c.code.toLowerCase()));
+        }
+        
         setLoading(false);
       } catch (error) {
         console.error('Error fetching countries:', error);
@@ -71,7 +81,7 @@ export default function MapCanvas({ selectedCountry, filters }: MapCanvasProps) 
     };
 
     fetchCountries();
-  }, [filters]);
+  }, [filters, onResultsUpdate]);
 
   // Handle window resize
   useEffect(() => {
@@ -108,9 +118,11 @@ export default function MapCanvas({ selectedCountry, filters }: MapCanvasProps) 
       .attr('viewBox', `0 0 ${width} ${height}`)
       .style('display', 'block');
 
-    // Create projection with proper centering and smaller scale to show more of the world
+    // Create projection with responsive scale - much more zoomed in on mobile
+    const isMobile = width < 768;
+    const baseScale = isMobile ? width / 2.5 : width / 7;  // Much more zoomed for mobile
     const projection = geoMercator()
-      .scale(width / 7)  // Reduced scale to show more of the map
+      .scale(baseScale)
       .center([0, 20])   // Center slightly north to better show landmasses
       .translate([width / 2, height / 2]);
 
@@ -123,7 +135,9 @@ export default function MapCanvas({ selectedCountry, filters }: MapCanvasProps) 
     
     // Also create map by alpha-2 codes for better matching
     const countryDataByAlpha2 = new Map(
-      countriesData.map(c => [c.code_alpha2?.toUpperCase(), c]).filter(([k]) => k)
+      countriesData
+        .map(c => [c.code_alpha2?.toUpperCase(), c] as const)
+        .filter((entry): entry is [string, typeof entry[1]] => !!entry[0])
     );
     
     console.log('🗺️ Map Debug:', {
@@ -221,7 +235,15 @@ export default function MapCanvas({ selectedCountry, filters }: MapCanvasProps) 
         // Create container for zoom
         const g = svg.append('g');
 
-        // Draw countries
+        // Create a set of filtered country alpha-2 codes for quick lookup
+        const filteredCountryCodes = new Set(
+          countriesData.map(c => c.code_alpha2?.toUpperCase()).filter(Boolean)
+        );
+        const hasActiveFilter = filters?.region || filters?.search || 
+                               filters?.difficulty_min !== undefined || 
+                               filters?.difficulty_max !== undefined;
+
+        // Draw countries with highlighting
         g.selectAll('path')
           .data(countries.features)
           .join('path')
@@ -231,14 +253,41 @@ export default function MapCanvas({ selectedCountry, filters }: MapCanvasProps) 
             const alpha2 = numericToAlpha2[d.id];
             const countryData = alpha2 ? countryDataByAlpha2.get(alpha2) : null;
             
+            // If there's an active filter, highlight only filtered countries
+            if (hasActiveFilter) {
+              if (alpha2 && filteredCountryCodes.has(alpha2)) {
+                // Highlighted filtered country
+                if (countryData && countryData.difficulty_score) {
+                  return colorScale(countryData.difficulty_score);
+                }
+                return '#4FFFB0';
+              } else {
+                // Dimmed non-filtered country
+                return '#2A2A2A';
+              }
+            }
+            
+            // No filter - normal display
             if (countryData && countryData.difficulty_score) {
               return colorScale(countryData.difficulty_score);
             }
             // Return different color for unmapped vs no data
             return alpha2 ? '#E0E0E0' : '#F5F5F5';
           })
-          .attr('stroke', '#ffffff')
-          .attr('stroke-width', 0.5)
+          .attr('stroke', (d: any) => {
+            const alpha2 = numericToAlpha2[d.id];
+            if (hasActiveFilter && alpha2 && filteredCountryCodes.has(alpha2)) {
+              return '#4FFFB0';
+            }
+            return '#ffffff';
+          })
+          .attr('stroke-width', (d: any) => {
+            const alpha2 = numericToAlpha2[d.id];
+            if (hasActiveFilter && alpha2 && filteredCountryCodes.has(alpha2)) {
+              return 1.5;
+            }
+            return 0.5;
+          })
           .attr('class', 'country')
           .style('cursor', (d: any) => {
             const alpha2 = numericToAlpha2[d.id];
@@ -315,10 +364,14 @@ export default function MapCanvas({ selectedCountry, filters }: MapCanvasProps) 
                   d3.zoomIdentity.translate(translate[0], translate[1]).scale(scale)
                 );
 
+              // Set transitioning state
+              setIsTransitioning(true);
+              setHighlightedCountry(alpha2);
+              
               // Highlight selected country
               g.selectAll('path')
                 .transition()
-                .duration(300)
+                .duration(400)
                 .attr('fill', (pathData: any) => {
                   const pathAlpha2 = numericToAlpha2[pathData.id];
                   return pathAlpha2 === alpha2 ? '#0FF' : '#3A3A3A';
@@ -336,10 +389,13 @@ export default function MapCanvas({ selectedCountry, filters }: MapCanvasProps) 
                   return pathAlpha2 === alpha2 ? 'drop-shadow(0 0 15px #0FF) drop-shadow(0 0 25px #0FF)' : 'none';
                 });
               
-              // Navigate after animation
+              // Trigger callback after zoom animation
               setTimeout(() => {
-                router.push(`/explore?country=${countryData.code.toLowerCase()}`);
-              }, 800);
+                setIsTransitioning(false);
+                if (onCountrySelect) {
+                  onCountrySelect(countryData.code.toLowerCase());
+                }
+              }, 750);
             }
           });
 
@@ -405,8 +461,17 @@ export default function MapCanvas({ selectedCountry, filters }: MapCanvasProps) 
               });
           }
         } else {
-          // Reset to difficulty colors when no country selected
+          // Reset to difficulty colors when no country selected - with smooth transition
+          svg.transition()
+            .duration(750)
+            .call(
+              zoom.transform as any,
+              d3.zoomIdentity
+            );
+
           g.selectAll('path')
+            .transition()
+            .duration(500)
             .attr('fill', (d: any) => {
               const alpha2 = numericToAlpha2[d.id];
               const countryData = alpha2 ? countryDataByAlpha2.get(alpha2) : null;
@@ -436,6 +501,64 @@ export default function MapCanvas({ selectedCountry, filters }: MapCanvasProps) 
       }
     };
   }, [selectedCountry, router, dimensions, countriesData, loading]);
+
+  // Handle region zoom when selectedRegion changes OR when filtered countries change
+  useEffect(() => {
+    if (!svgRef.current || dimensions.width === 0) return;
+
+    const svg = d3.select(svgRef.current);
+    const width = dimensions.width;
+    const height = dimensions.height;
+    const isMobile = width < 768;
+    const baseScale = isMobile ? width / 2.5 : width / 7;
+
+    // If we have a selected region, zoom to it
+    if (selectedRegion) {
+      // Define region boundaries (approximate lat/lon bounds)
+      const regionBounds: Record<string, { center: [number, number], scale: number }> = {
+        'Africa': { center: [20, 0], scale: isMobile ? width / 2.5 : width / 4 },
+        'Americas': { center: [-80, 0], scale: isMobile ? width / 2.5 : width / 4 },
+        'Asia': { center: [95, 34], scale: isMobile ? width / 3 : width / 5 },
+        'Europe': { center: [15, 54], scale: isMobile ? width / 2 : width / 3 },
+        'Oceania': { center: [140, -25], scale: isMobile ? width / 2.5 : width / 3.5 },
+      };
+
+      const bounds = regionBounds[selectedRegion];
+      if (!bounds) return;
+
+      const projection = geoMercator()
+        .scale(bounds.scale)
+        .center(bounds.center)
+        .translate([width / 2, height / 2]);
+
+      const zoom = d3.zoom()
+        .scaleExtent([1.5, 8])
+        .translateExtent([[-width * 1, -height * 1], [width * 2, height * 2]]);
+
+      svg.transition()
+        .duration(750)
+        .call(
+          zoom.transform as any,
+          d3.zoomIdentity
+            .translate(width / 2, height / 2)
+            .scale(bounds.scale / baseScale)
+            .translate(-projection(bounds.center)![0], -projection(bounds.center)![1])
+        );
+    }
+    // If there's a filter active with results, zoom to fit all filtered countries
+    else if (countriesData.length > 0 && countriesData.length < 50 && 
+             (filters?.region || filters?.search)) {
+      // Auto-zoom to show filtered countries
+      const targetScale = isMobile ? width / 2 : width / 4.5;
+      
+      svg.transition()
+        .duration(750)
+        .call(
+          d3.zoom().transform as any,
+          d3.zoomIdentity.scale(targetScale / baseScale)
+        );
+    }
+  }, [selectedRegion, dimensions, countriesData.length, filters]);
 
   // Helper function to map numeric ISO codes to alpha-3 codes
   const getISOCodeFromId = (numericId: number): string => {
@@ -481,12 +604,16 @@ export default function MapCanvas({ selectedCountry, filters }: MapCanvasProps) 
     <>
       <motion.div
         ref={containerRef}
-        className={`absolute inset-0 transition-all duration-300 ${
-          selectedCountry ? 'blur-sm opacity-60' : ''
-        }`}
+        className="absolute inset-0"
         initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.5 }}
+        animate={{ 
+          opacity: 1,
+          filter: selectedCountry || isTransitioning ? 'blur(4px)' : 'blur(0px)',
+        }}
+        transition={{ 
+          opacity: { duration: 0.5 },
+          filter: { duration: 0.5, ease: 'easeInOut' }
+        }}
       >
         <svg 
           ref={svgRef} 

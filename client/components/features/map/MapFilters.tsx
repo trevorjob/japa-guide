@@ -15,18 +15,23 @@ export interface FilterState {
 }
 
 export default function MapFilters({ onFilterChange }: MapFiltersProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('mapFiltersExpanded');
+      return saved === 'true';
+    }
+    return false;
+  });
   const [selectedRegion, setSelectedRegion] = useState<string>('');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  // Load expanded state from localStorage
+  // Save expanded state to localStorage when it changes
   useEffect(() => {
-    const saved = localStorage.getItem('mapFiltersExpanded');
-    if (saved !== null) {
-      setIsExpanded(saved === 'true');
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('mapFiltersExpanded', String(isExpanded));
     }
-  }, []);
+  }, [isExpanded]);
 
   // Save expanded state to localStorage
   const toggleExpanded = () => {
@@ -37,12 +42,11 @@ export default function MapFilters({ onFilterChange }: MapFiltersProps) {
 
   const regions = [
     { value: '', label: 'All Regions' },
-    { value: 'Europe', label: 'Europe' },
-    { value: 'Asia', label: 'Asia' },
-    { value: 'North America', label: 'North America' },
-    { value: 'South America', label: 'South America' },
-    { value: 'Oceania', label: 'Oceania' },
     { value: 'Africa', label: 'Africa' },
+    { value: 'Americas', label: 'Americas' },
+    { value: 'Asia', label: 'Asia' },
+    { value: 'Europe', label: 'Europe' },
+    { value: 'Oceania', label: 'Oceania' },
   ];
 
   const difficulties = [

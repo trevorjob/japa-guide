@@ -11,11 +11,13 @@ import CostCalculator from '@/components/features/calculator/CostCalculator';
 import RoadmapWizard from '@/components/features/roadmap/RoadmapWizard';
 
 interface CountryDrawerProps {
-  countryCode: string;
+  countryCode: string | null;
   isOpen: boolean;
+  onClose: () => void;
+  onChatOpen?: () => void;
 }
 
-export default function CountryDrawer({ countryCode, isOpen }: CountryDrawerProps) {
+export default function CountryDrawer({ countryCode, isOpen, onClose, onChatOpen }: CountryDrawerProps) {
   const router = useRouter();
   const [countryData, setCountryData] = useState<Country | null>(null);
   const [visaRoutes, setVisaRoutes] = useState<VisaType[]>([]);
@@ -27,6 +29,8 @@ export default function CountryDrawer({ countryCode, isOpen }: CountryDrawerProp
   const [isRoadmapWizardOpen, setIsRoadmapWizardOpen] = useState(false);
 
   const fetchCountryData = useCallback(async () => {
+    if (!countryCode) return;
+    
     try {
       setLoading(true);
       setError(null);
@@ -59,7 +63,7 @@ export default function CountryDrawer({ countryCode, isOpen }: CountryDrawerProp
   }, [countryCode, isOpen, fetchCountryData]);
 
   const handleClose = () => {
-    router.push('/explore');
+    onClose();
   };
 
   const handleAction = (action: string) => {
@@ -98,7 +102,7 @@ export default function CountryDrawer({ countryCode, isOpen }: CountryDrawerProp
   };
 
   return (
-    <AnimatePresence>
+    <AnimatePresence mode="wait">
       {isOpen && (
         <>
           {/* Backdrop */}
@@ -108,6 +112,7 @@ export default function CountryDrawer({ countryCode, isOpen }: CountryDrawerProp
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
             onClick={handleClose}
           />
 
@@ -118,7 +123,10 @@ export default function CountryDrawer({ countryCode, isOpen }: CountryDrawerProp
             initial={{ x: '100%', opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: '100%', opacity: 0 }}
-            transition={{ duration: 0.35, ease: 'easeOut' }}
+            transition={{ 
+              duration: 0.5,
+              ease: [0.25, 0.1, 0.25, 1]
+            }}
           >
             {/* Header */}
             <div className="sticky top-0 z-10 glass-heavy border-b border-glass-border p-6 flex items-center justify-between">
@@ -178,29 +186,51 @@ export default function CountryDrawer({ countryCode, isOpen }: CountryDrawerProp
 
             {/* Content */}
             {!loading && !error && countryData && (
-              <div className="p-6 space-y-6">
+              <motion.div 
+                className="p-6 space-y-6"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ 
+                  duration: 0.5,
+                  delay: 0.2,
+                  ease: [0.25, 0.1, 0.25, 1]
+                }}
+              >
                 {/* Hero Image (if available) */}
                 {countryData.hero_image && (
-                  <div className="relative h-48 -mx-6 -mt-6 mb-6">
+                  <motion.div 
+                    className="relative h-48 -mx-6 -mt-6 mb-6"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5, delay: 0.5 }}
+                  >
                     <img
                       src={countryData.hero_image}
                       alt={countryData.name}
                       className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-bg-primary dark:from-dark-bg-primary to-transparent"></div>
-                  </div>
+                  </motion.div>
                 )}
 
                 {/* Summary */}
                 {countryData.summary && (
-                  <div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.6 }}
+                  >
                     <h3 className="text-sm font-semibold text-text-secondary mb-2">Overview</h3>
                     <p className="text-sm text-text-primary leading-relaxed">{countryData.summary}</p>
-                  </div>
+                  </motion.div>
                 )}
 
                 {/* Quick Stats */}
-                <div>
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.7 }}
+                >
                   <h3 className="text-sm font-semibold text-text-secondary mb-3">Quick Stats</h3>
                   <div className="grid grid-cols-3 gap-3">
                     <div className="bg-bg-secondary dark:bg-dark-bg-secondary rounded-xl p-4">
@@ -229,11 +259,15 @@ export default function CountryDrawer({ countryCode, isOpen }: CountryDrawerProp
                       </div>
                     </div>
                   </div>
-                </div>
+                </motion.div>
 
                 {/* Cost Breakdown */}
                 {(countryData.avg_rent_monthly_usd || countryData.avg_meal_cost_usd || countryData.healthcare_monthly_usd) && (
-                  <div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.8 }}
+                  >
                     <h3 className="text-sm font-semibold text-text-secondary mb-3">Monthly Costs (USD)</h3>
                     <div className="space-y-2">
                       {countryData.avg_rent_monthly_usd && (
@@ -257,7 +291,7 @@ export default function CountryDrawer({ countryCode, isOpen }: CountryDrawerProp
                         </div>
                       )}
                     </div>
-                  </div>
+                    </motion.div>
                 )}
 
                 {/* Key Statistics */}
@@ -406,7 +440,7 @@ export default function CountryDrawer({ countryCode, isOpen }: CountryDrawerProp
                   </motion.button>
 
                   <motion.button
-                    onClick={() => router.push(`/explore?country=${countryCode}&chat=true`)}
+                    onClick={() => onChatOpen && onChatOpen()}
                     className="w-full px-6 py-3 bg-bg-secondary dark:bg-dark-bg-secondary text-text-primary font-medium rounded-full hover:bg-bg-tertiary dark:hover:bg-dark-bg-tertiary transition-colors"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -415,7 +449,7 @@ export default function CountryDrawer({ countryCode, isOpen }: CountryDrawerProp
                   </motion.button>
                 </div>
               </div>
-            </div>
+              </motion.div>
             )}
           </motion.div>
         </>

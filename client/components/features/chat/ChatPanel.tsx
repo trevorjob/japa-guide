@@ -8,7 +8,7 @@ import type { ChatMessage, ChatRequest } from '@/types';
 
 const STORAGE_KEY = 'japa_guide_chat_history';
 
-export default function ChatPanel() {
+export default function ChatPanel({ onClose }: { onClose?: () => void }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -91,7 +91,11 @@ export default function ChatPanel() {
   };
 
   const handleClose = () => {
-    router.back();
+    if (onClose) {
+      onClose();
+    } else {
+      router.back();
+    }
   };
 
   const handleClearChat = () => {
