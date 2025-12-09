@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Suspense, useState } from 'react';
+import React, { Suspense, useState, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { Spinner } from '@/components/ui/Loading';
 import GlassButton from '@/components/ui/GlassButton';
@@ -61,45 +61,49 @@ function MapPageContent() {
     window.history.pushState({}, '', url.toString());
   };
 
-  const handleCountrySelect = (countryCode: string) => {
+  const handleCountrySelect = useCallback((countryCode: string) => {
     setSelectedCountry(countryCode);
     updateURL({ country: countryCode });
-  };
+  }, []);
 
-  const handleCountryClose = () => {
+  const handleCountryClose = useCallback(() => {
     setSelectedCountry(null);
     updateURL({ country: null });
     
     // Clear filters if we auto-selected from a single search result
     // This prevents the drawer from immediately reopening
-    if (mapFilters.search) {
-      setMapFilters({});
-      setSelectedRegion(null);
-    }
-  };
+    setMapFilters(prev => {
+      if (prev.search) {
+        return {};
+      }
+      return prev;
+    });
+    setSelectedRegion(null);
+  }, []);
 
-  const handleChatOpen = () => {
+  const handleChatOpen = useCallback(() => {
     setChatOpen(true);
     updateURL({ chat: true });
-  };
+  }, []);
 
-  const handleChatClose = () => {
+  const handleChatClose = useCallback(() => {
     setChatOpen(false);
     updateURL({ chat: false });
-  };
+  }, []);
 
-  const handleResultsUpdate = (count: number, countries: string[]) => {
+  const handleResultsUpdate = useCallback((count: number, countries: string[]) => {
     // Auto-select if only one result
     if (count === 1 && countries.length === 1) {
-      handleCountrySelect(countries[0]);
+      setSelectedCountry(countries[0]);
+      updateURL({ country: countries[0] });
     }
-  };
+  }, []);
 
-  const handleFilterChange = (filters: typeof mapFilters) => {
+  const handleFilterChange = useCallback((filters: typeof mapFilters) => {
     setMapFilters(filters);
     // Sync selectedRegion with filter region to trigger zoom
     setSelectedRegion(filters.region || null);
-  };
+  }, []);
 
   return (
     <div className="relative w-full h-full overflow-hidden">

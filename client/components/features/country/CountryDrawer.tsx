@@ -22,6 +22,7 @@ export default function CountryDrawer({ countryCode, isOpen, onClose, onChatOpen
   const [countryData, setCountryData] = useState<Country | null>(null);
   const [visaRoutes, setVisaRoutes] = useState<VisaType[]>([]);
   const [loading, setLoading] = useState(true);
+  const [visaLoading, setVisaLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedVisa, setSelectedVisa] = useState<VisaType | null>(null);
   const [isVisaModalOpen, setIsVisaModalOpen] = useState(false);
@@ -35,20 +36,23 @@ export default function CountryDrawer({ countryCode, isOpen, onClose, onChatOpen
       setLoading(true);
       setError(null);
       
-      // Fetch country details
+      // Fetch only country details first for fast drawer opening
       const country = await countryService.getByCode(countryCode.toUpperCase());
       setCountryData(country);
+      setLoading(false);
       
-      // Fetch visa routes for this country
+      // Load visa routes in background after drawer is shown
+      setVisaLoading(true);
       try {
         const visas = await visaService.getByCountry(country.id);
         setVisaRoutes(visas);
       } catch (visaError) {
         console.warn('Could not fetch visa routes:', visaError);
         setVisaRoutes([]);
+      } finally {
+        setVisaLoading(false);
       }
       
-      setLoading(false);
     } catch (err) {
       console.error('Error fetching country data:', err);
       setError('Failed to load country data');
@@ -102,10 +106,10 @@ export default function CountryDrawer({ countryCode, isOpen, onClose, onChatOpen
   };
 
   return (
-    <AnimatePresence mode="wait">
-      {isOpen && (
-        <>
-          {/* Backdrop */}
+    <>
+      <AnimatePresence mode="wait">
+        {isOpen && (
+          /* Backdrop */
           <motion.div
             key="country-drawer-backdrop"
             className="fixed inset-0 bg-overlay-dim z-20"
@@ -115,17 +119,23 @@ export default function CountryDrawer({ countryCode, isOpen, onClose, onChatOpen
             transition={{ duration: 0.3, ease: 'easeInOut' }}
             onClick={handleClose}
           />
+        )}
+      </AnimatePresence>
 
-          {/* Drawer */}
+      <AnimatePresence mode="wait">
+        {isOpen && (
+          /* Drawer */
           <motion.div
             key="country-drawer"
             className="fixed top-0 right-0 h-full w-full md:w-[420px] bg-bg-primary/10 md:backdrop-blur-xl shadow-float z-30 overflow-y-auto"
-            initial={{ x: '100%', opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: '100%', opacity: 0 }}
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
             transition={{ 
-              duration: 0.5,
-              ease: [0.25, 0.1, 0.25, 1]
+              type: 'spring',
+              damping: 30,
+              stiffness: 300,
+              mass: 0.8
             }}
           >
             {/* Header */}
@@ -378,7 +388,21 @@ export default function CountryDrawer({ countryCode, isOpen, onClose, onChatOpen
                   <h3 className="text-sm font-semibold text-text-secondary mb-3">
                     Popular Visa Routes {visaRoutes.length > 0 && `(${visaRoutes.length})`}
                   </h3>
-                  {visaRoutes.length > 0 ? (
+                  {visaLoading ? (
+                    <div className="space-y-2">
+                      {[1, 2, 3].map((i) => (
+                        <div key={i} className="w-full p-3 rounded-lg border border-bg-tertiary dark:border-dark-bg-tertiary animate-pulse">
+                          <div className="flex items-start gap-2">
+                            <div className="w-2 h-2 rounded-full bg-bg-tertiary dark:bg-dark-bg-tertiary mt-1.5"></div>
+                            <div className="flex-1 space-y-2">
+                              <div className="h-4 bg-bg-tertiary dark:bg-dark-bg-tertiary rounded w-2/3"></div>
+                              <div className="h-3 bg-bg-tertiary dark:bg-dark-bg-tertiary rounded w-1/3"></div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : visaRoutes.length > 0 ? (
                     <div className="space-y-2">
                       {visaRoutes.slice(0, 5).map((visa) => (
                         <button
@@ -452,8 +476,8 @@ export default function CountryDrawer({ countryCode, isOpen, onClose, onChatOpen
               </motion.div>
             )}
           </motion.div>
-        </>
-      )}
+        )}
+      </AnimatePresence>
 
       {/* Visa Route Modal */}
       <VisaRouteModal
@@ -484,6 +508,6 @@ export default function CountryDrawer({ countryCode, isOpen, onClose, onChatOpen
           onClose={() => setIsRoadmapWizardOpen(false)}
         />
       )}
-    </AnimatePresence>
+    </>
   );
 }
