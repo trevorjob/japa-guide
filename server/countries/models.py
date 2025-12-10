@@ -133,3 +133,56 @@ class Country(models.Model):
         """Auto-update data quality score on save"""
         self.data_quality_score = self.calculate_data_quality_score()
         super().save(*args, **kwargs)
+
+
+class EconomicIndicator(models.Model):
+    """
+    Stores economic indicators from external sources (World Bank, etc.).
+    Allows tracking historical data and multiple sources per indicator.
+    """
+    country = models.ForeignKey(
+        Country,
+        on_delete=models.CASCADE,
+        related_name='economic_indicators'
+    )
+    indicator_name = models.CharField(
+        max_length=50,
+        db_index=True,
+        help_text="e.g., gdp_per_capita_usd, unemployment_rate, income_category"
+    )
+    value = models.DecimalField(
+        max_digits=20,
+        decimal_places=4,
+        null=True,
+        blank=True,
+        help_text="Numeric value for the indicator"
+    )
+    value_text = models.CharField(
+        max_length=100,
+        blank=True,
+        help_text="Text value for categorical indicators (e.g., income_category)"
+    )
+    year = models.IntegerField(db_index=True)
+    source_name = models.CharField(
+        max_length=50,
+        default='World Bank',
+        help_text="Data source name"
+    )
+    source_indicator_code = models.CharField(
+        max_length=50,
+        blank=True,
+        help_text="Original indicator code from source API"
+    )
+    fetched_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-year', 'country', 'indicator_name']
+        unique_together = ['country', 'indicator_name', 'year']
+        indexes = [
+            models.Index(fields=['country', 'indicator_name']),
+            models.Index(fields=['year', 'indicator_name']),
+        ]
+
+    def __str__(self):
+        val = self.value_text if self.value_text else self.value
+        return f"{self.country.code} - {self.indicator_name} ({self.year}): {val}"
