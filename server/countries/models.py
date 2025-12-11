@@ -2,6 +2,79 @@ from django.db import models
 from cloudinary.models import CloudinaryField
 
 
+class Source(models.Model):
+    """
+    Tracks data provenance - where information came from and how reliable it is.
+    Used for audit trails and data transparency.
+    """
+    SOURCE_TYPE_CHOICES = [
+        ('official', 'Official Government Source'),
+        ('index', 'Research Index/Report'),
+        ('aggregator', 'Data Aggregator'),
+    ]
+    
+    RELIABILITY_CHOICES = [
+        ('high', 'High - Official/Verified'),
+        ('medium', 'Medium - Reputable Third-Party'),
+        ('low', 'Low - Unverified/Estimated'),
+    ]
+    
+    name = models.CharField(
+        max_length=255,
+        help_text="Name of the data source (e.g., 'World Bank Open Data')"
+    )
+    url = models.URLField(
+        blank=True,
+        help_text="URL to the source or API documentation"
+    )
+    country = models.ForeignKey(
+        'Country',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='sources',
+        help_text="If source is country-specific (e.g., a government website)"
+    )
+    source_type = models.CharField(
+        max_length=20,
+        choices=SOURCE_TYPE_CHOICES,
+        default='aggregator',
+        db_index=True
+    )
+    reliability_level = models.CharField(
+        max_length=10,
+        choices=RELIABILITY_CHOICES,
+        default='medium',
+        db_index=True
+    )
+    description = models.TextField(
+        blank=True,
+        help_text="Description of what data this source provides"
+    )
+    last_checked = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="When we last verified this source was active/accurate"
+    )
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Whether this source is still being used"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['name']
+        indexes = [
+            models.Index(fields=['source_type']),
+            models.Index(fields=['reliability_level']),
+        ]
+    
+    def __str__(self):
+        country_str = f" ({self.country.code})" if self.country else ""
+        return f"{self.name}{country_str} [{self.reliability_level}]"
+
+
 class Country(models.Model):
     """
     Country model with migration-related metadata and cost data.
@@ -95,6 +168,13 @@ class Country(models.Model):
     # Quality Flags
     data_quality_score = models.IntegerField(default=0, help_text="0-100 completeness score")
     needs_review = models.BooleanField(default=False)
+    data_confidence = models.CharField(
+        max_length=10,
+        choices=[('low', 'Low'), ('medium', 'Medium'), ('high', 'High')],
+        default='medium',
+        db_index=True,
+        help_text="Confidence level in the accuracy of this data"
+    )
     is_featured = models.BooleanField(default=False, help_text="Featured on homepage")
     
     # Flexible metadata for future expansion
@@ -186,3 +266,86 @@ class EconomicIndicator(models.Model):
     def __str__(self):
         val = self.value_text if self.value_text else self.value
         return f"{self.country.code} - {self.indicator_name} ({self.year}): {val}"
+
+
+class CountryDocument(models.Model):
+    """
+    RAG-ready documents for country-specific immigration information.
+    These are chunked, factual documents sourced from official sources.
+    """
+    DOC_TYPE_CHOICES = [
+        ('overview', 'Country Overview'),
+        ('visas', 'Visa Pathways'),
+        ('work', 'Work Immigration'),
+        ('study', 'Study Immigration'),
+        ('family', 'Family Immigration'),
+        ('asylum', 'Asylum & Refugee'),
+        ('citizenship', 'Citizenship & Naturalization'),
+    ]
+    
+    country = models.ForeignKey(
+        Country,
+        on_delete=models.CASCADE,
+        related_name='documents'
+    )
+    title = models.CharField(
+        max_length=255,
+        help_text="Document title for display and search"
+    )
+    content = models.TextField(
+        help_text="Full document content - will be chunked for RAG"
+    )
+    doc_type = models.CharField(
+        max_length=20,
+        choices=DOC_TYPE_CHOICES,
+        db_index=True
+    )
+    source = models.ForeignKey(
+        Source,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='documents',
+        help_text="Primary source for this document"
+    )
+    
+    # Data quality tracking
+    data_confidence = models.CharField(
+        max_length=10,
+        choices=[('low', 'Low'), ('medium', 'Medium'), ('high', 'High')],
+        default='medium',
+        db_index=True
+    )
+    needs_review = models.BooleanField(
+        default=False,
+        help_text="Flag for documents needing verification"
+    )
+    
+    # Metadata
+    word_count = models.IntegerField(default=0, editable=False)
+    last_verified = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="When content was last verified against source"
+    )
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['country', 'doc_type', 'title']
+        unique_together = ['country', 'doc_type', 'title']
+        indexes = [
+            models.Index(fields=['country', 'doc_type']),
+            models.Index(fields=['doc_type']),
+            models.Index(fields=['data_confidence']),
+        ]
+    
+    def save(self, *args, **kwargs):
+        # Auto-calculate word count
+        self.word_count = len(self.content.split()) if self.content else 0
+        super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return f"{self.country.code} - {self.get_doc_type_display()}: {self.title}"

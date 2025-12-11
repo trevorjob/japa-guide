@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { countryService, visaService } from '@/lib/services';
 import type { Country, VisaType } from '@/types';
 import { Spinner } from '@/components/ui/Loading';
+import DataTransparencyBadge, { buildSourcesFromCountry, TIER_1_COUNTRIES } from '@/components/features/country/DataTransparencyBadge';
 import VisaRouteModal from '@/components/features/visa/VisaRouteModal';
 import CostCalculator from '@/components/features/calculator/CostCalculator';
 import RoadmapWizard from '@/components/features/roadmap/RoadmapWizard';
@@ -268,6 +269,17 @@ export default function CountryDrawer({ countryCode, isOpen, onClose, onChatOpen
                         {countryData.currency}
                       </div>
                     </div>
+                  </div>
+                  
+                  {/* Data Transparency Badge */}
+                  <div className="mt-4">
+                    <DataTransparencyBadge 
+                      confidence={countryData.data_confidence || 'low'}
+                      needsReview={countryData.needs_review}
+                      lastUpdated={countryData.updated_at}
+                      sources={buildSourcesFromCountry(countryData)}
+                      isTier1={TIER_1_COUNTRIES.has(countryData.code)}
+                    />
                   </div>
                 </motion.div>
 

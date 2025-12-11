@@ -37,6 +37,20 @@ class VisaType(models.Model):
     is_popular = models.BooleanField(default=False)
     is_renewable = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
+    
+    # Data transparency
+    data_confidence = models.CharField(
+        max_length=10,
+        choices=[('low', 'Low'), ('medium', 'Medium'), ('high', 'High')],
+        default='medium',
+        db_index=True,
+        help_text="Confidence level in the accuracy of this visa data"
+    )
+    needs_review = models.BooleanField(
+        default=False,
+        help_text="Flag for data that needs manual verification"
+    )
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

@@ -13,8 +13,6 @@ interface MapCanvasProps {
   selectedCountry: string | null;
   filters?: {
     region?: string;
-    difficulty_min?: number;
-    difficulty_max?: number;
     search?: string;
   };
   selectedRegion?: string | null;
@@ -69,14 +67,6 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
           params.region = filters.region;
         }
         
-        if (filters?.difficulty_min !== undefined) {
-          params.difficulty_score__gte = filters.difficulty_min;
-        }
-        
-        if (filters?.difficulty_max !== undefined) {
-          params.difficulty_score__lte = filters.difficulty_max;
-        }
-        
         if (filters?.search) {
           params.search = filters.search;
         }
@@ -100,7 +90,7 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
     fetchCountries();
     // Note: onResultsUpdate is intentionally excluded from deps to prevent refetch on parent re-renders
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters?.region, filters?.difficulty_min, filters?.difficulty_max, filters?.search]);
+  }, [filters?.region, filters?.search]);
 
   // Handle window resize
   useEffect(() => {
@@ -260,10 +250,15 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
             .slice(0, 10)
         });
 
-        // Color scale for difficulty
-        const colorScale = d3.scaleLinear<string>()
-          .domain([1, 10])
-          .range(['#E8F4F8', '#2C4A6B']); // CSS variables don't work in D3
+        // Region-based color palette (neutral, data-agnostic)
+        const regionColors: Record<string, string> = {
+          'Africa': '#7B8CDE',
+          'Americas': '#6BBF8A', 
+          'Asia': '#E8A87C',
+          'Europe': '#85C1E9',
+          'Oceania': '#C39BD3',
+        };
+        const defaultColor = '#B8C5D1'; // For countries without region data
 
         // Create container for zoom
         const g = svg.append('g');
@@ -272,9 +267,7 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
         const filteredCountryCodes = new Set(
           countriesData.map(c => c.code_alpha2?.toUpperCase()).filter(Boolean)
         );
-        const hasActiveFilter = filters?.region || filters?.search || 
-                               filters?.difficulty_min !== undefined || 
-                               filters?.difficulty_max !== undefined;
+        const hasActiveFilter = filters?.region || filters?.search;
 
         // Draw countries with highlighting
         g.selectAll('path')
@@ -289,9 +282,9 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
             // If there's an active filter, highlight only filtered countries
             if (hasActiveFilter) {
               if (alpha2 && filteredCountryCodes.has(alpha2)) {
-                // Highlighted filtered country
-                if (countryData && countryData.difficulty_score) {
-                  return colorScale(countryData.difficulty_score);
+                // Highlighted filtered country - use region color
+                if (countryData && countryData.region) {
+                  return regionColors[countryData.region] || '#4FFFB0';
                 }
                 return '#4FFFB0';
               } else {
@@ -300,9 +293,9 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
               }
             }
             
-            // No filter - normal display
-            if (countryData && countryData.difficulty_score) {
-              return colorScale(countryData.difficulty_score);
+            // No filter - use region-based colors
+            if (countryData && countryData.region) {
+              return regionColors[countryData.region] || defaultColor;
             }
             // Return different color for unmapped vs no data
             return alpha2 ? '#E0E0E0' : '#F5F5F5';
@@ -336,13 +329,10 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
                 .attr('fill', '#0FF')
                 .attr('stroke-width', 1.5);
 
-              const difficulty = countryData.difficulty_score || 0;
-              const difficultyLabel = difficulty <= 3 ? 'Easy' : difficulty <= 6 ? 'Medium' : 'Hard';
-
               setTooltip({
                 x: event.clientX,
                 y: event.clientY,
-                content: `${countryData.name} - ${difficultyLabel}`
+                content: `${countryData.name}${countryData.region ? ` • ${countryData.region}` : ''}`
               });
             }
           })
@@ -351,13 +341,10 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
             const countryData = alpha2 ? countryDataByAlpha2.get(alpha2) : null;
             
             if (countryData) {
-              const difficulty = countryData.difficulty_score || 0;
-              const difficultyLabel = difficulty <= 3 ? 'Easy' : difficulty <= 6 ? 'Medium' : 'Hard';
-              
               setTooltip({
                 x: event.clientX,
                 y: event.clientY,
-                content: `${countryData.name} - ${difficultyLabel}`
+                content: `${countryData.name}${countryData.region ? ` • ${countryData.region}` : ''}`
               });
             }
           })
@@ -367,7 +354,7 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
             
             if (countryData) {
               d3.select(this)
-                .attr('fill', countryData.difficulty_score ? colorScale(countryData.difficulty_score) : '#E0E0E0')
+                .attr('fill', countryData.region ? (regionColors[countryData.region] || defaultColor) : '#E0E0E0')
                 .attr('stroke-width', 0.5);
             }
 
@@ -540,7 +527,7 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
     // Use specific filter values instead of filter object to prevent reference changes
     // Note: selectedCountry and onCountrySelect are intentionally excluded - they're handled in separate effects
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router, dimensions, countriesData, loading, filters?.region, filters?.difficulty_min, filters?.difficulty_max, filters?.search]);
+  }, [router, dimensions, countriesData, loading, filters?.region, filters?.search]);
 
   // Handle selected country highlight and zoom - SEPARATE effect to avoid full re-render
   useEffect(() => {
@@ -563,19 +550,22 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
     );
     
     // Check if there's an active filter
-    const hasActiveFilter = filters?.region || filters?.search || 
-                           filters?.difficulty_min !== undefined || 
-                           filters?.difficulty_max !== undefined;
+    const hasActiveFilter = filters?.region || filters?.search;
     
     // Create a set of filtered country alpha-2 codes for quick lookup
     const filteredCountryCodes = new Set(
       countriesData.map(c => c.code_alpha2?.toUpperCase()).filter(Boolean)
     );
     
-    // Color scale
-    const colorScale = d3.scaleLinear<string>()
-      .domain([1, 10])
-      .range(['#E8F4F8', '#2C4A6B']);
+    // Region-based color palette (matches initial render)
+    const regionColors: Record<string, string> = {
+      'Africa': '#7B8CDE',
+      'Americas': '#6BBF8A', 
+      'Asia': '#E8A87C',
+      'Europe': '#85C1E9',
+      'Oceania': '#C39BD3',
+    };
+    const defaultColor = '#B8C5D1';
     
     // Numeric to alpha2 mapping
     const numericToAlpha2: Record<string, string> = {
@@ -660,9 +650,9 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
           // If there's an active filter, highlight only filtered countries
           if (hasActiveFilter) {
             if (alpha2 && filteredCountryCodes.has(alpha2)) {
-              // Highlighted filtered country
-              if (countryData && countryData.difficulty_score) {
-                return colorScale(countryData.difficulty_score);
+              // Highlighted filtered country - use region color
+              if (countryData && countryData.region) {
+                return regionColors[countryData.region] || '#4FFFB0';
               }
               return '#4FFFB0';
             } else {
@@ -671,9 +661,9 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
             }
           }
           
-          // No filter - normal difficulty-based colors using all countries data
-          if (countryData && countryData.difficulty_score) {
-            return colorScale(countryData.difficulty_score);
+          // No filter - normal region-based colors using all countries data
+          if (countryData && countryData.region) {
+            return regionColors[countryData.region] || defaultColor;
           }
           return alpha2 ? '#E0E0E0' : '#F5F5F5';
         })

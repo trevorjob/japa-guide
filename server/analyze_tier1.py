@@ -1,5 +1,4 @@
-LE'] = 'japaguide.settings'
-django.setup()
+
 
 from countries.models import Country
 from visas.models import VisaType

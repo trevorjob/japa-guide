@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Quick script to verify World Bank sync results."""
+"""Quick script to verify World Bank sync results and data provenance."""
 import os
 import sys
 import django
@@ -7,7 +7,8 @@ import django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'japaguide.settings')
 django.setup()
 
-from countries.models import Country, EconomicIndicator
+from countries.models import Country, EconomicIndicator, Source
+from visas.models import VisaType
 from django.db.models import Count
 
 print("=" * 50)
@@ -61,4 +62,19 @@ for row in EconomicIndicator.objects.filter(indicator_name='income_category').va
 
 print("\n" + "=" * 50)
 print("✅ Sync verification complete!")
+print("=" * 50)
+
+# Data Provenance Verification
+print("\n" + "=" * 50)
+print("DATA PROVENANCE STATUS")
+print("=" * 50)
+print(f"\n🔍 Countries needing review: {Country.objects.filter(needs_review=True).count()}")
+print(f"📉 Countries with low confidence: {Country.objects.filter(data_confidence='low').count()}")
+print(f"📊 Countries with medium confidence: {Country.objects.filter(data_confidence='medium').count()}")
+print(f"✅ Countries with high confidence: {Country.objects.filter(data_confidence='high').count()}")
+
+print(f"\n🔍 Visa types needing review: {VisaType.objects.filter(needs_review=True).count()}")
+print(f"📉 Visa types with low confidence: {VisaType.objects.filter(data_confidence='low').count()}")
+
+print(f"\n📚 Source records: {Source.objects.count()}")
 print("=" * 50)

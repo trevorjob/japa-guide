@@ -400,6 +400,22 @@ export default function CostCalculator({ country, isOpen, onClose }: CostCalcula
                       </p>
                       <p className="text-sm text-text-secondary">{results.savings_plan.description}</p>
                     </div>
+
+                    {/* Disclaimer */}
+                    <div className="p-4 bg-yellow-500/10 rounded-xl border border-yellow-500/20">
+                      <div className="flex items-start gap-3">
+                        <span className="text-lg">⚠️</span>
+                        <div>
+                          <h4 className="text-sm font-semibold text-yellow-600 dark:text-yellow-400 mb-1">Important Disclaimer</h4>
+                          <p className="text-xs text-text-secondary leading-relaxed">
+                            These are rough estimates based on available data and may not reflect current prices. 
+                            Actual costs vary significantly based on lifestyle, exact location, exchange rates, and timing. 
+                            We recommend adding a 20-30% buffer for unexpected expenses. Always verify costs with 
+                            recent sources before making financial decisions.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
                   </motion.div>
                 )}
 

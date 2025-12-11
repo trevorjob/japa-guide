@@ -9,9 +9,8 @@ interface MapFiltersProps {
 
 export interface FilterState {
   region?: string;
-  difficulty_min?: number;
-  difficulty_max?: number;
   search?: string;
+  // Note: difficulty_min and difficulty_max removed - difficulty scores are unreliable
 }
 
 export default function MapFilters({ onFilterChange }: MapFiltersProps) {
@@ -23,7 +22,6 @@ export default function MapFilters({ onFilterChange }: MapFiltersProps) {
     return false;
   });
   const [selectedRegion, setSelectedRegion] = useState<string>('');
-  const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   // Save expanded state to localStorage when it changes
@@ -49,54 +47,29 @@ export default function MapFilters({ onFilterChange }: MapFiltersProps) {
     { value: 'Oceania', label: 'Oceania' },
   ];
 
-  const difficulties = [
-    { value: 'all', label: 'All Levels', min: undefined, max: undefined },
-    { value: 'easy', label: 'Easy (1-3)', min: 1, max: 3 },
-    { value: 'medium', label: 'Medium (4-6)', min: 4, max: 6 },
-    { value: 'hard', label: 'Hard (7-10)', min: 7, max: 10 },
-  ];
-
   const handleRegionChange = (region: string) => {
     setSelectedRegion(region);
-    const difficulty = difficulties.find(d => d.value === selectedDifficulty);
     onFilterChange({
       region: region || undefined,
-      difficulty_min: difficulty?.min,
-      difficulty_max: difficulty?.max,
-      search: searchQuery || undefined,
-    });
-  };
-
-  const handleDifficultyChange = (difficultyValue: string) => {
-    setSelectedDifficulty(difficultyValue);
-    const difficulty = difficulties.find(d => d.value === difficultyValue);
-    onFilterChange({
-      region: selectedRegion || undefined,
-      difficulty_min: difficulty?.min,
-      difficulty_max: difficulty?.max,
       search: searchQuery || undefined,
     });
   };
 
   const handleSearchChange = (search: string) => {
     setSearchQuery(search);
-    const difficulty = difficulties.find(d => d.value === selectedDifficulty);
     onFilterChange({
       region: selectedRegion || undefined,
-      difficulty_min: difficulty?.min,
-      difficulty_max: difficulty?.max,
       search: search || undefined,
     });
   };
 
   const handleReset = () => {
     setSelectedRegion('');
-    setSelectedDifficulty('all');
     setSearchQuery('');
     onFilterChange({});
   };
 
-  const activeFiltersCount = (selectedRegion ? 1 : 0) + (selectedDifficulty !== 'all' ? 1 : 0) + (searchQuery ? 1 : 0);
+  const activeFiltersCount = (selectedRegion ? 1 : 0) + (searchQuery ? 1 : 0);
 
   return (
       <motion.div
@@ -201,28 +174,6 @@ export default function MapFilters({ onFilterChange }: MapFiltersProps) {
                     >
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium mb-2 block">Difficulty</label>
-                  <div className="space-y-1">
-                    {difficulties.map((difficulty) => (
-                      <label
-                        key={difficulty.value}
-                        className="flex items-center gap-3 px-3 py-1 rounded-lg hover:bg-white/5 cursor-pointer transition-colors group"
-                      >
-                        <input
-                          type="radio"
-                          name="difficulty"
-                          value={difficulty.value}
-                          checked={selectedDifficulty === difficulty.value}
-                          onChange={(e) => handleDifficultyChange(e.target.value)}
-                          className="w-4 h-4 accent-accent-primary cursor-pointer"
-                        />
-                        <span className="text-sm group-hover:text-white transition-colors">{difficulty.label}</span>
-                      </label>
-                    ))}
                   </div>
                 </div>
 

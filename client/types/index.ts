@@ -66,6 +66,7 @@ export interface Country {
   
   // Data Quality & Tracking
   data_quality_score?: number;
+  data_confidence?: 'low' | 'medium' | 'high';
   needs_review?: boolean;
   is_featured?: boolean;
   basic_data_source?: string;

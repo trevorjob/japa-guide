@@ -36,8 +36,6 @@ function MapPageContent() {
   const [chatOpen, setChatOpen] = useState(false);
   const [mapFilters, setMapFilters] = useState<{
     region?: string;
-    difficulty_min?: number;
-    difficulty_max?: number;
     search?: string;
   }>({});
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);

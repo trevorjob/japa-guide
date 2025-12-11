@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Country
+from .models import Country, Source, CountryDocument
 
 
 class CountryListSerializer(serializers.ModelSerializer):
@@ -52,3 +52,49 @@ class CountryDetailSerializer(serializers.ModelSerializer):
     
     def get_visa_types_count(self, obj):
         return obj.visa_types.filter(is_active=True).count()
+
+
+class SourceSerializer(serializers.ModelSerializer):
+    """Serializer for data sources."""
+    country_name = serializers.CharField(source='country.name', read_only=True)
+    
+    class Meta:
+        model = Source
+        fields = [
+            'id', 'name', 'url', 'country', 'country_name',
+            'source_type', 'reliability_level', 'description',
+            'last_checked', 'is_active', 'created_at', 'updated_at'
+        ]
+
+
+class CountryDocumentSerializer(serializers.ModelSerializer):
+    """Serializer for RAG documents."""
+    country_name = serializers.CharField(source='country.name', read_only=True)
+    country_code = serializers.CharField(source='country.code', read_only=True)
+    source_name = serializers.CharField(source='source.name', read_only=True)
+    doc_type_display = serializers.CharField(source='get_doc_type_display', read_only=True)
+    
+    class Meta:
+        model = CountryDocument
+        fields = [
+            'id', 'country', 'country_name', 'country_code',
+            'title', 'content', 'doc_type', 'doc_type_display',
+            'source', 'source_name',
+            'data_confidence', 'needs_review', 'word_count',
+            'last_verified', 'created_at', 'updated_at'
+        ]
+
+
+class CountryDocumentListSerializer(serializers.ModelSerializer):
+    """Lightweight serializer for document lists (no content)."""
+    country_name = serializers.CharField(source='country.name', read_only=True)
+    country_code = serializers.CharField(source='country.code', read_only=True)
+    doc_type_display = serializers.CharField(source='get_doc_type_display', read_only=True)
+    
+    class Meta:
+        model = CountryDocument
+        fields = [
+            'id', 'country', 'country_name', 'country_code',
+            'title', 'doc_type', 'doc_type_display',
+            'data_confidence', 'word_count', 'updated_at'
+        ]

@@ -10,6 +10,7 @@ from django.conf import settings
 from django.core.cache import cache
 from openai import OpenAI  # DeepSeek uses OpenAI-compatible API
 from .models import PromptTemplate, AIRequest
+from .prompt_templates import get_system_prompt, SAFETY_RULES
 
 
 # Personality definitions
@@ -121,10 +122,17 @@ class AIService:
         # Make API call
         start_time = time.time()
         try:
+            # Build context-aware system prompt with safety rules
+            system_prompt = get_system_prompt(
+                context_type=context.get('context_type', 'base'),
+                country_name=context.get('country_name', 'the destination country'),
+                data_confidence=context.get('data_confidence', 'low')
+            )
+            
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=[
-                    {"role": "system", "content": "You are Japabot, a helpful migration assistant."},
+                    {"role": "system", "content": system_prompt},
                     {"role": "user", "content": prompt_text}
                 ],
                 temperature=temperature,
