@@ -72,11 +72,14 @@ function MapPageContent() {
     // This prevents the drawer from immediately reopening
     setMapFilters(prev => {
       if (prev.search) {
+        setSelectedRegion(null);
         return {};
       }
+      // Keep region filter active - MapCanvas will zoom back to region
       return prev;
     });
-    setSelectedRegion(null);
+    // Don't clear selectedRegion if we still have a region filter
+    // MapCanvas will use filters.region to zoom back to the region
   }, []);
 
   const handleChatOpen = useCallback(() => {

@@ -35,6 +35,8 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
   // Ref to track if map has been rendered to avoid unnecessary re-renders
   const mapRenderedRef = useRef(false);
   const lastRenderKeyRef = useRef<string>('');
+  // Track previous selected country to detect deselection
+  const prevSelectedCountryRef = useRef<string | null>(null);
 
   // Fetch all countries once on mount for color reference
   useEffect(() => {
@@ -685,8 +687,45 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
         })
         .style('filter', 'none');
         
-      // Reset zoom only if no filter is active
-      if (!hasActiveFilter && zoomRef.current) {
+      // Handle zoom based on filter state
+      if (hasActiveFilter && zoomRef.current) {
+        // If region filter is active, zoom back to that region
+        const activeRegion = filters?.region;
+        if (activeRegion) {
+          const width = dimensions.width;
+          const height = dimensions.height;
+          const isMobile = width < 768;
+          const baseScale = isMobile ? width / 2.5 : width / 7;
+          
+          const regionBounds: Record<string, { center: [number, number], scale: number }> = {
+            'Africa': { center: [20, 0], scale: isMobile ? width / 2.5 : width / 4 },
+            'Americas': { center: [-80, 0], scale: isMobile ? width / 2.5 : width / 4 },
+            'Asia': { center: [95, 34], scale: isMobile ? width / 3 : width / 5 },
+            'Europe': { center: [15, 54], scale: isMobile ? width / 2 : width / 3 },
+            'Oceania': { center: [140, -25], scale: isMobile ? width / 2.5 : width / 3.5 },
+          };
+          
+          const bounds = regionBounds[activeRegion];
+          if (bounds) {
+            const projection = geoMercator()
+              .scale(bounds.scale)
+              .center(bounds.center)
+              .translate([width / 2, height / 2]);
+            
+            svg.transition()
+              .duration(750)
+              .call(
+                zoomRef.current.transform as any,
+                d3.zoomIdentity
+                  .translate(width / 2, height / 2)
+                  .scale(bounds.scale / baseScale)
+                  .translate(-projection(bounds.center)![0], -projection(bounds.center)![1])
+              );
+          }
+        }
+        // For search filter, just stay at current zoom (don't reset to world)
+      } else if (zoomRef.current) {
+        // No filter - reset to world view
         svg.transition()
           .duration(500)
           .call(zoomRef.current.transform as any, d3.zoomIdentity);
@@ -694,9 +733,18 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
     }
   }, [selectedCountry, dimensions, countriesData, allCountriesData, loading, filters]);
 
-  // Handle region zoom when selectedRegion changes OR when filtered countries change
+  // Handle region zoom when selectedRegion explicitly changes (from filter panel)
   useEffect(() => {
     if (!svgRef.current || dimensions.width === 0) return;
+    
+    // Update ref to track previous selected country
+    prevSelectedCountryRef.current = selectedCountry;
+    
+    // Skip if a country is selected (country zoom takes precedence)
+    if (selectedCountry) return;
+    
+    // Only zoom when selectedRegion is explicitly set (from filter change)
+    if (!selectedRegion) return;
 
     const svg = d3.select(svgRef.current);
     const width = dimensions.width;
@@ -704,53 +752,38 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
     const isMobile = width < 768;
     const baseScale = isMobile ? width / 2.5 : width / 7;
 
-    // If we have a selected region, zoom to it
-    if (selectedRegion) {
-      // Define region boundaries (approximate lat/lon bounds)
-      const regionBounds: Record<string, { center: [number, number], scale: number }> = {
-        'Africa': { center: [20, 0], scale: isMobile ? width / 2.5 : width / 4 },
-        'Americas': { center: [-80, 0], scale: isMobile ? width / 2.5 : width / 4 },
-        'Asia': { center: [95, 34], scale: isMobile ? width / 3 : width / 5 },
-        'Europe': { center: [15, 54], scale: isMobile ? width / 2 : width / 3 },
-        'Oceania': { center: [140, -25], scale: isMobile ? width / 2.5 : width / 3.5 },
-      };
+    // Define region boundaries (approximate lat/lon bounds)
+    const regionBounds: Record<string, { center: [number, number], scale: number }> = {
+      'Africa': { center: [20, 0], scale: isMobile ? width / 2.5 : width / 4 },
+      'Americas': { center: [-80, 0], scale: isMobile ? width / 2.5 : width / 4 },
+      'Asia': { center: [95, 34], scale: isMobile ? width / 3 : width / 5 },
+      'Europe': { center: [15, 54], scale: isMobile ? width / 2 : width / 3 },
+      'Oceania': { center: [140, -25], scale: isMobile ? width / 2.5 : width / 3.5 },
+    };
 
-      const bounds = regionBounds[selectedRegion];
-      if (!bounds) return;
+    const bounds = regionBounds[selectedRegion];
+    if (!bounds) return;
 
-      const projection = geoMercator()
-        .scale(bounds.scale)
-        .center(bounds.center)
-        .translate([width / 2, height / 2]);
+    const projection = geoMercator()
+      .scale(bounds.scale)
+      .center(bounds.center)
+      .translate([width / 2, height / 2]);
 
-      const zoom = d3.zoom()
-        .scaleExtent([1.5, 8])
-        .translateExtent([[-width * 1, -height * 1], [width * 2, height * 2]]);
+    // Use zoomRef if available, otherwise create new zoom
+    const zoom = zoomRef.current || d3.zoom()
+      .scaleExtent([1.5, 8])
+      .translateExtent([[-width * 1, -height * 1], [width * 2, height * 2]]);
 
-      svg.transition()
-        .duration(750)
-        .call(
-          zoom.transform as any,
-          d3.zoomIdentity
-            .translate(width / 2, height / 2)
-            .scale(bounds.scale / baseScale)
-            .translate(-projection(bounds.center)![0], -projection(bounds.center)![1])
-        );
-    }
-    // If there's a filter active with results, zoom to fit all filtered countries
-    else if (countriesData.length > 0 && countriesData.length < 50 && 
-             (filters?.region || filters?.search)) {
-      // Auto-zoom to show filtered countries
-      const targetScale = isMobile ? width / 2 : width / 4.5;
-      
-      svg.transition()
-        .duration(750)
-        .call(
-          d3.zoom().transform as any,
-          d3.zoomIdentity.scale(targetScale / baseScale)
-        );
-    }
-  }, [selectedRegion, dimensions, countriesData.length, filters]);
+    svg.transition()
+      .duration(750)
+      .call(
+        zoom.transform as any,
+        d3.zoomIdentity
+          .translate(width / 2, height / 2)
+          .scale(bounds.scale / baseScale)
+          .translate(-projection(bounds.center)![0], -projection(bounds.center)![1])
+      );
+  }, [selectedRegion, selectedCountry, dimensions]);
 
   // Helper function to map numeric ISO codes to alpha-3 codes
   const getISOCodeFromId = (numericId: number): string => {

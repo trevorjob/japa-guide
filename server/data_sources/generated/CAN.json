@@ -1,0 +1,13 @@
+{
+  "country_code": "CAN",
+  "country_name": "Canada",
+  "agency": "Immigration, Refugees and Citizenship Canada (IRCC)",
+  "portal_url": "https://www.canada.ca/en/immigration-refugees-citizenship.html",
+  "processed_at": "2025-12-12T11:45:12.563211",
+  "documents": {
+    "overview": {
+      "status": "failed",
+      "error": "No content could be scraped from sources"
+    }
+  }
+}

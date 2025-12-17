@@ -1,0 +1,348 @@
+{
+  "_meta": {
+    "description": "Official immigration data sources for Tier-1 countries",
+    "version": "1.0",
+    "last_updated": "2025-12-12",
+    "doc_types": ["overview", "work", "study", "family", "asylum", "citizenship"]
+  },
+  "countries": {
+    "CAN": {
+      "name": "Canada",
+      "agency": "Immigration, Refugees and Citizenship Canada (IRCC)",
+      "portal_url": "https://www.canada.ca/en/immigration-refugees-citizenship.html",
+      "sources": {
+        "overview": [
+          "https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada.html"        ],
+        "work": [
+          "https://www.canada.ca/en/immigration-refugees-citizenship/services/work-canada.html",
+          "https://www.canada.ca/en/immigration-refugees-citizenship/services/work-canada/permit.html"
+        ],
+        "study": [
+          "https://www.canada.ca/en/immigration-refugees-citizenship/services/study-canada.html",
+          "https://www.canada.ca/en/immigration-refugees-citizenship/services/study-canada/study-permit.html"
+        ],
+        "family": [
+          "https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/family-sponsorship.html"
+        ],
+        "citizenship": [
+          "https://www.canada.ca/en/immigration-refugees-citizenship/services/canadian-citizenship.html"
+        ]
+      }
+    },
+    "USA": {
+      "name": "United States",
+      "agency": "U.S. Citizenship and Immigration Services (USCIS)",
+      "portal_url": "https://www.uscis.gov/",
+      "sources": {
+        "overview": [
+          "https://www.uscis.gov/"
+        ],
+        "work": [
+          "https://www.uscis.gov/working-in-the-united-states",
+          "https://www.uscis.gov/working-in-the-united-states/temporary-nonimmigrant-workers"
+        ],
+        "study": [
+          "https://www.uscis.gov/working-in-the-united-states/students-and-exchange-visitors"
+        ],
+        "family": [
+          "https://www.uscis.gov/family"
+        ],
+        "citizenship": [
+          "https://www.uscis.gov/citizenship"
+        ]
+      }
+    },
+    "GBR": {
+      "name": "United Kingdom",
+      "agency": "UK Home Office - Visas and Immigration",
+      "portal_url": "https://www.gov.uk/browse/visas-immigration",
+      "sources": {
+        "overview": [
+          "https://www.gov.uk/browse/visas-immigration"
+        ],
+        "work": [
+          "https://www.gov.uk/browse/visas-immigration/work-visas",
+          "https://www.gov.uk/skilled-worker-visa"
+        ],
+        "study": [
+          "https://www.gov.uk/browse/visas-immigration/student-visas",
+          "https://www.gov.uk/student-visa"
+        ],
+        "family": [
+          "https://www.gov.uk/browse/visas-immigration/family-visas"
+        ],
+        "citizenship": [
+          "https://www.gov.uk/browse/citizenship/citizenship"
+        ]
+      }
+    },
+    "AUS": {
+      "name": "Australia",
+      "agency": "Department of Home Affairs",
+      "portal_url": "https://immi.homeaffairs.gov.au/",
+      "sources": {
+        "overview": [
+          "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-finder"
+        ],
+        "work": [
+          "https://immi.homeaffairs.gov.au/visas/working-in-australia",
+          "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/skilled-independent-189"
+        ],
+        "study": [
+          "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/student-500"
+        ],
+        "family": [
+          "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/partner-onshore-801-820"
+        ],
+        "citizenship": [
+          "https://immi.homeaffairs.gov.au/citizenship"
+        ]
+      }
+    },
+    "DEU": {
+      "name": "Germany",
+      "agency": "Federal Office for Migration and Refugees (BAMF)",
+      "portal_url": "https://www.make-it-in-germany.com/en/",
+      "sources": {
+        "overview": [
+          "https://www.make-it-in-germany.com/en/visa-residence/types"
+        ],
+        "work": [
+          "https://www.make-it-in-germany.com/en/visa-residence/types/work",
+          "https://www.make-it-in-germany.com/en/visa-residence/types/eu-blue-card"
+        ],
+        "study": [
+          "https://www.make-it-in-germany.com/en/study-training"
+        ],
+        "family": [
+          "https://www.make-it-in-germany.com/en/living-in-germany/family-reunification"
+        ],
+        "citizenship": [
+          "https://www.make-it-in-germany.com/en/visa-residence/living-permanently/naturalisation"
+        ]
+      }
+    },
+    "IRL": {
+      "name": "Ireland",
+      "agency": "Irish Immigration Service Delivery (ISD)",
+      "portal_url": "https://www.irishimmigration.ie/",
+      "sources": {
+        "overview": [
+          "https://www.irishimmigration.ie/"
+        ],
+        "work": [
+          "https://www.irishimmigration.ie/coming-to-work-in-ireland/",
+          "https://enterprise.gov.ie/en/what-we-do/workplace-and-skills/employment-permits/"
+        ],
+        "study": [
+          "https://www.irishimmigration.ie/coming-to-study-in-ireland/"
+        ],
+        "family": [
+          "https://www.irishimmigration.ie/coming-to-join-family-in-ireland/"
+        ],
+        "citizenship": [
+          "https://www.irishimmigration.ie/citizenship/"
+        ]
+      }
+    },
+    "NLD": {
+      "name": "Netherlands",
+      "agency": "Immigration and Naturalisation Service (IND)",
+      "portal_url": "https://ind.nl/en",
+      "sources": {
+        "overview": [
+          "https://ind.nl/en"
+        ],
+        "work": [
+          "https://ind.nl/en/work",
+          "https://ind.nl/en/residence-permits/work/highly-skilled-migrant"
+        ],
+        "study": [
+          "https://ind.nl/en/residence-permits/study"
+        ],
+        "family": [
+          "https://ind.nl/en/residence-permits/family"
+        ],
+        "citizenship": [
+          "https://ind.nl/en/dutch-citizenship"
+        ]
+      }
+    },
+    "NZL": {
+      "name": "New Zealand",
+      "agency": "Immigration New Zealand",
+      "portal_url": "https://www.immigration.govt.nz/",
+      "sources": {
+        "overview": [
+          "https://www.immigration.govt.nz/new-zealand-visas"
+        ],
+        "work": [
+          "https://www.immigration.govt.nz/new-zealand-visas/options/work",
+          "https://www.immigration.govt.nz/new-zealand-visas/apply-for-a-visa/about-visa/skilled-migrant-category-resident-visa"
+        ],
+        "study": [
+          "https://www.immigration.govt.nz/new-zealand-visas/options/study"
+        ],
+        "family": [
+          "https://www.immigration.govt.nz/new-zealand-visas/options/live-permanently/all-resident-visas/family-category-visas"
+        ],
+        "citizenship": [
+          "https://www.govt.nz/browse/passports-citizenship-and-identity/nz-citizenship/"
+        ]
+      }
+    },
+    "FRA": {
+      "name": "France",
+      "agency": "Ministry of the Interior - France Visas",
+      "portal_url": "https://france-visas.gouv.fr/en/",
+      "sources": {
+        "overview": [
+          "https://france-visas.gouv.fr/en/web/france-visas/"
+        ],
+        "work": [
+          "https://france-visas.gouv.fr/en/web/france-visas/professional-purpose"
+        ],
+        "study": [
+          "https://france-visas.gouv.fr/en/web/france-visas/student"
+        ],
+        "family": [
+          "https://france-visas.gouv.fr/en/web/france-visas/family"
+        ],
+        "citizenship": [
+          "https://www.service-public.fr/particuliers/vosdroits/N111"
+        ]
+      }
+    },
+    "PRT": {
+      "name": "Portugal",
+      "agency": "Agency for Integration, Migration and Asylum (AIMA)",
+      "portal_url": "https://www.sef.pt/en/",
+      "sources": {
+        "overview": [
+          "https://www.sef.pt/en/pages/conteudo-detalhe.aspx?nID=21"
+        ],
+        "work": [
+          "https://www.sef.pt/en/pages/conteudo-detalhe.aspx?nID=62"
+        ],
+        "study": [
+          "https://www.sef.pt/en/pages/conteudo-detalhe.aspx?nID=61"
+        ],
+        "family": [
+          "https://www.sef.pt/en/pages/conteudo-detalhe.aspx?nID=60"
+        ],
+        "citizenship": [
+          "https://www.sef.pt/en/pages/conteudo-detalhe.aspx?nID=63"
+        ]
+      }
+    },
+    "ARE": {
+      "name": "United Arab Emirates",
+      "agency": "Federal Authority for Identity and Citizenship (ICP)",
+      "portal_url": "https://icp.gov.ae/en/",
+      "sources": {
+        "overview": [
+          "https://u.ae/en/information-and-services/visa-and-emirates-id/residence-visa"
+        ],
+        "work": [
+          "https://u.ae/en/information-and-services/visa-and-emirates-id/residence-visa/work-residence-visa",
+          "https://u.ae/en/information-and-services/visa-and-emirates-id/residence-visa/golden-visa"
+        ],
+        "study": [
+          "https://u.ae/en/information-and-services/visa-and-emirates-id/residence-visa/student-residence-visa"
+        ],
+        "family": [
+          "https://u.ae/en/information-and-services/visa-and-emirates-id/residence-visa/family-visa"
+        ]
+      }
+    },
+    "SGP": {
+      "name": "Singapore",
+      "agency": "Immigration & Checkpoints Authority (ICA)",
+      "portal_url": "https://www.ica.gov.sg/",
+      "sources": {
+        "overview": [
+          "https://www.mom.gov.sg/passes-and-permits"
+        ],
+        "work": [
+          "https://www.mom.gov.sg/passes-and-permits/employment-pass",
+          "https://www.mom.gov.sg/passes-and-permits/s-pass"
+        ],
+        "study": [
+          "https://www.ica.gov.sg/enter-transit-depart/entering-singapore/long-term-visit-pass/student-pass"
+        ],
+        "family": [
+          "https://www.ica.gov.sg/reside/dp-social-visit-pass/apply"
+        ],
+        "citizenship": [
+          "https://www.ica.gov.sg/become-pr/naturalisation"
+        ]
+      }
+    },
+    "JPN": {
+      "name": "Japan",
+      "agency": "Immigration Services Agency of Japan",
+      "portal_url": "https://www.isa.go.jp/en/",
+      "sources": {
+        "overview": [
+          "https://www.isa.go.jp/en/applications/procedures/index.html"
+        ],
+        "work": [
+          "https://www.isa.go.jp/en/applications/status/workingjapan.html"
+        ],
+        "study": [
+          "https://www.isa.go.jp/en/applications/status/gakusei.html"
+        ],
+        "family": [
+          "https://www.isa.go.jp/en/applications/status/dependent.html"
+        ],
+        "citizenship": [
+          "https://www.moj.go.jp/ENGLISH/information/tcon-01.html"
+        ]
+      }
+    },
+    "ZAF": {
+      "name": "South Africa",
+      "agency": "Department of Home Affairs",
+      "portal_url": "https://www.dha.gov.za/",
+      "sources": {
+        "overview": [
+          "https://www.dha.gov.za/index.php/immigration-services/types-of-visas"
+        ],
+        "work": [
+          "https://www.dha.gov.za/index.php/immigration-services/work-permits"
+        ],
+        "study": [
+          "https://www.dha.gov.za/index.php/immigration-services/study-visas"
+        ],
+        "family": [
+          "https://www.dha.gov.za/index.php/immigration-services/relatives-visas"
+        ],
+        "citizenship": [
+          "https://www.dha.gov.za/index.php/civic-services/citizenship"
+        ]
+      }
+    },
+    "CHE": {
+      "name": "Switzerland",
+      "agency": "State Secretariat for Migration (SEM)",
+      "portal_url": "https://www.sem.admin.ch/sem/en/home.html",
+      "sources": {
+        "overview": [
+          "https://www.sem.admin.ch/sem/en/home/themen/einreise.html"
+        ],
+        "work": [
+          "https://www.sem.admin.ch/sem/en/home/themen/arbeit.html"
+        ],
+        "study": [
+          "https://www.sem.admin.ch/sem/en/home/themen/einreise/kurzfristig/drittstaaten/aus_studium.html"
+        ],
+        "family": [
+          "https://www.sem.admin.ch/sem/en/home/themen/aufenthalt/familiennachzug.html"
+        ],
+        "citizenship": [
+          "https://www.sem.admin.ch/sem/en/home/themen/buergerrecht.html"
+        ]
+      }
+    }
+  }
+}
