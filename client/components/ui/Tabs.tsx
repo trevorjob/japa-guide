@@ -40,18 +40,18 @@ export const Tabs = ({
             className={({ selected }) =>
               cn(
                 'relative px-4 py-2.5 text-sm font-medium transition-all duration-200',
-                'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary-from)] focus-visible:ring-offset-2',
+                'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-2',
                 variant === 'pills' && [
                   'rounded-full',
                   selected
-                    ? 'bg-gradient-to-r from-[var(--primary-from)] to-[var(--primary-to)] text-white shadow-glow-primary'
-                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-secondary)]',
+                    ? 'bg-gradient-to-r from-accent-primary to-accent-secondary text-white shadow-lg'
+                    : 'text-text-secondary hover:text-text-primary hover:bg-bg-secondary',
                 ],
                 variant === 'underline' && [
                   'border-b-2',
                   selected
-                    ? 'border-[var(--primary-from)] text-[var(--primary-from)]'
-                    : 'border-transparent text-[var(--text-secondary)] hover:text-[var(--text-primary)]',
+                    ? 'border-accent-primary text-accent-primary'
+                    : 'border-transparent text-text-secondary hover:text-text-primary',
                 ]
               )
             }
@@ -63,7 +63,7 @@ export const Tabs = ({
                 {variant === 'underline' && selected && (
                   <motion.div
                     layoutId="activeTab"
-                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-[var(--primary-from)]"
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-accent-primary"
                     transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                   />
                 )}

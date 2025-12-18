@@ -128,7 +128,7 @@ export default function CountryDrawer({ countryCode, isOpen, onClose, onChatOpen
           /* Drawer */
           <motion.div
             key="country-drawer"
-            className="fixed top-0 right-0 h-full w-full md:w-[420px] bg-bg-primary/10 md:backdrop-blur-xl shadow-float z-30 overflow-y-auto"
+            className="fixed top-0 right-0 h-full w-full md:w-[420px] bg-bg-primary/5 md:backdrop-blur-xl shadow-float z-30 overflow-y-auto"
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}

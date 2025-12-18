@@ -252,15 +252,15 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
             .slice(0, 10)
         });
 
-        // Region-based color palette (neutral, data-agnostic)
+        // Region-based color palette (cool, cohesive tones)
         const regionColors: Record<string, string> = {
-          'Africa': '#7B8CDE',
-          'Americas': '#6BBF8A', 
-          'Asia': '#E8A87C',
-          'Europe': '#85C1E9',
-          'Oceania': '#C39BD3',
+          'Africa': '#64748B',      // Slate
+          'Americas': '#0D9488',    // Teal 
+          'Asia': '#0891B2',        // Cyan
+          'Europe': '#0EA5E9',      // Sky blue
+          'Oceania': '#14B8A6',     // Teal-green
         };
-        const defaultColor = '#B8C5D1'; // For countries without region data
+        const defaultColor = '#475569'; // Slate for countries without region data
 
         // Create container for zoom
         const g = svg.append('g');
@@ -559,15 +559,15 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
       countriesData.map(c => c.code_alpha2?.toUpperCase()).filter(Boolean)
     );
     
-    // Region-based color palette (matches initial render)
+    // Region-based color palette (cool, cohesive tones)
     const regionColors: Record<string, string> = {
-      'Africa': '#7B8CDE',
-      'Americas': '#6BBF8A', 
-      'Asia': '#E8A87C',
-      'Europe': '#85C1E9',
-      'Oceania': '#C39BD3',
+      'Africa': '#64748B',      // Slate
+      'Americas': '#0D9488',    // Teal 
+      'Asia': '#0891B2',        // Cyan
+      'Europe': '#0EA5E9',      // Sky blue
+      'Oceania': '#14B8A6',     // Teal-green
     };
-    const defaultColor = '#B8C5D1';
+    const defaultColor = '#475569';
     
     // Numeric to alpha2 mapping
     const numericToAlpha2: Record<string, string> = {

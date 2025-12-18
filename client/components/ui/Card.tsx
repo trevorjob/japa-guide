@@ -44,8 +44,8 @@ export const Card = ({
 
   const variantStyles = {
     glass: 'glass',
-    elevated: 'bg-white dark:bg-[var(--bg-secondary)] shadow-elevation',
-    feature: 'bg-white dark:bg-[var(--bg-secondary)] relative',
+    elevated: 'bg-bg-secondary shadow-elevation',
+    feature: 'bg-bg-secondary relative',
   };
 
   const hoverAnimation = hover
@@ -58,7 +58,7 @@ export const Card = ({
   return (
     <div className={cn('relative', variant === 'feature' && 'group', className)}>
       {variant === 'feature' && (
-        <div className="absolute -inset-1 bg-gradient-to-r from-[var(--primary-from)] to-[var(--accent-to)] rounded-3xl blur opacity-0 group-hover:opacity-30 transition duration-500" />
+        <div className="absolute -inset-1 bg-gradient-to-r from-accent-primary to-accent-secondary rounded-3xl blur opacity-0 group-hover:opacity-30 transition duration-500" />
       )}
 
       <motion.div

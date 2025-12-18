@@ -38,11 +38,11 @@ export const Button = ({
 
   const variantStyles = {
     primary:
-      'bg-gradient-to-r from-[var(--primary-from)] to-[var(--primary-to)] text-white shadow-glow-primary hover:shadow-glow-primary',
-    secondary: 'glass border-2 border-[var(--primary-from)] hover:bg-[var(--primary-from)]/10',
-    ghost: 'hover:bg-[var(--bg-secondary)] border border-transparent hover:border-[var(--primary-from)]',
+      'bg-gradient-to-r from-accent-primary to-accent-secondary text-white shadow-lg hover:shadow-xl hover:brightness-110',
+    secondary: 'glass-card border border-accent-primary/30 text-text-primary hover:border-accent-primary/50 hover:bg-accent-primary/5',
+    ghost: 'hover:bg-bg-tertiary border border-transparent hover:border-glass-border text-text-primary',
     accent:
-      'bg-gradient-to-r from-[var(--accent-from)] to-[var(--accent-to)] text-white shadow-glow-accent',
+      'bg-gradient-to-r from-accent-warm to-amber-500 text-white shadow-lg hover:shadow-xl',
   };
 
   const sizeStyles = {
@@ -61,7 +61,7 @@ export const Button = ({
       <motion.div
         className={cn(
           'relative overflow-hidden rounded-full font-semibold transition-all duration-300',
-          'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary-from)] focus-visible:ring-offset-2',
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-2',
           'disabled:opacity-50 disabled:cursor-not-allowed',
           'group',
           variantStyles[variant],

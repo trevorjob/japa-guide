@@ -229,14 +229,14 @@ export default function ChatPanel({ onClose }: { onClose?: () => void }) {
 
   return (
     <motion.div
-      className="fixed bottom-0 right-0 md:right-8 md:bottom-8 w-full md:w-96 h-[70vh] md:max-h-[calc(100vh-56px)] md:h-auto glass-heavy rounded-t-2xl md:rounded-2xl shadow-float z-50 flex flex-col"
+      className="fixed bottom-0 right-0 md:right-8 md:bottom-8 w-full md:w-96 h-[70vh] md:max-h-[calc(100vh-56px)] md:h-auto glass-heavy glass-shine rounded-t-2xl md:rounded-2xl shadow-float z-50 flex flex-col"
       initial={{ y: '100%', opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       exit={{ y: '100%', opacity: 0 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
     >
       {/* Header */}
-      <div className="shrink-1 p-4 border-b border-glass-border">
+      <div className="shrink-1 p-4 border-b border-white/5">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
             <span className="text-2xl">{currentPersonality.emoji}</span>

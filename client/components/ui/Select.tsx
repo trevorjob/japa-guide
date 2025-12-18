@@ -54,12 +54,12 @@ export const Select = ({
           <div className="relative">
             <ListboxButton
               className={cn(
-                'relative w-full cursor-pointer rounded-xl border-2 bg-white dark:bg-[var(--bg-secondary)]',
-                'border-[var(--bg-tertiary)] py-3 pl-4 pr-10 text-left',
-                'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary-from)] focus-visible:ring-offset-2',
+                'relative w-full cursor-pointer rounded-xl border-2 bg-bg-secondary',
+                'border-glass-border py-3 pl-4 pr-10 text-left',
+                'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-2',
                 'disabled:opacity-50 disabled:cursor-not-allowed',
                 'transition-colors duration-200',
-                open && 'border-[var(--primary-from)]'
+                open && 'border-accent-primary'
               )}
             >
               <span className="flex items-center gap-2">
@@ -94,10 +94,9 @@ export const Select = ({
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.2 }}
                   className={cn(
                     'absolute z-10 mt-2 max-h-60 w-full overflow-auto rounded-xl',
-                    'glass-heavy border border-[var(--bg-tertiary)]',
+                    'glass-heavy',
                     'py-1 shadow-xl',
                     'focus:outline-none'
                   )}
@@ -110,8 +109,8 @@ export const Select = ({
                         cn(
                           'relative cursor-pointer select-none py-3 pl-4 pr-10',
                           'transition-colors duration-150',
-                          focus && 'bg-[var(--primary-from)]/10',
-                          selected && 'bg-[var(--primary-from)]/20'
+                          focus && 'bg-accent-primary/10',
+                          selected && 'bg-accent-primary/20'
                         )
                       }
                     >
@@ -129,7 +128,7 @@ export const Select = ({
                             </span>
                           </div>
                           {selected && (
-                            <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-[var(--primary-from)]">
+                            <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-accent-primary">
                               <svg
                                 className="h-5 w-5"
                                 xmlns="http://www.w3.org/2000/svg"

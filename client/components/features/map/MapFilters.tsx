@@ -75,7 +75,7 @@ export default function MapFilters({ onFilterChange }: MapFiltersProps) {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-card-background/60 backdrop-blur-lg rounded-2xl shadow-float overflow-hidden fixed bottom-6 left-6 z-30 border border-white/10"
+        className="glass-heavy glass-shine rounded-2xl shadow-float overflow-hidden fixed bottom-6 left-6 z-30"
         style={{maxWidth:"280px",  minWidth: '240px', padding: isExpanded ? '12px' : '8px' }}
       >
         {/* Header */}

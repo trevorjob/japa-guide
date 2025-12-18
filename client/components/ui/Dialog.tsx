@@ -76,8 +76,8 @@ export const Dialog = ({
                 onClick={onClose}
                 className={cn(
                   'absolute right-4 top-4 rounded-full p-2',
-                  'hover:bg-[var(--bg-secondary)] transition-colors',
-                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary-from)]'
+                  'hover:bg-bg-secondary transition-colors',
+                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary'
                 )}
               >
                 <svg

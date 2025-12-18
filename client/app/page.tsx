@@ -72,8 +72,8 @@ function HeroSection() {
       </div>
       
       <motion.div className="absolute bottom-8 left-1/2 -translate-x-1/2" animate={{ y: [0, 10, 0] }} transition={{ repeat: Infinity, duration: 1.5 }}>
-        <div className="w-6 h-10 border-2 border-[var(--primary-from)] rounded-full flex justify-center pt-2">
-          <motion.div className="w-1 h-3 bg-[var(--primary-from)] rounded-full" animate={{ y: [0, 12, 0], opacity: [1, 0, 1] }} transition={{ repeat: Infinity, duration: 1.5 }} />
+        <div className="w-6 h-10 border-2 border-accent-primary rounded-full flex justify-center pt-2">
+          <motion.div className="w-1 h-3 bg-accent-primary rounded-full" animate={{ y: [0, 12, 0], opacity: [1, 0, 1] }} transition={{ repeat: Infinity, duration: 1.5 }} />
         </div>
       </motion.div>
     </section>
@@ -123,12 +123,12 @@ function FeaturesSection() {
                     <motion.div className="text-6xl mb-4" whileHover={{ scale: 1.2, rotate: [0, -10, 10, 0] }} transition={{ duration: 0.5 }}>
                       {feature.icon}
                     </motion.div>
-                    <h3 className="text-2xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-[var(--primary-from)] to-[var(--primary-to)]">
+                    <h3 className="text-2xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-accent-primary to-accent-secondary">
                       {feature.title}
                     </h3>
-                    <p className="text-[var(--text-secondary)] mb-4">{feature.description}</p>
+                    <p className="text-text-secondary mb-4">{feature.description}</p>
                     <div className="mt-auto">
-                      <button className="text-[var(--primary-from)] hover:underline flex items-center group">
+                      <button className="text-accent-primary hover:underline flex items-center group">
                         Learn more
                         <motion.span className="ml-1" animate={{ x: [0, 5, 0] }} transition={{ repeat: Infinity, duration: 1.5 }}>
                           →
@@ -149,7 +149,7 @@ function FeaturesSection() {
 function CTASection() {
   return (
     <section className="py-24 px-4 relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-[var(--primary-from)] to-[var(--accent-to)] opacity-10" />
+      <div className="absolute inset-0 bg-gradient-to-br from-accent-primary to-accent-secondary opacity-10" />
       <div className="container mx-auto relative z-10">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}

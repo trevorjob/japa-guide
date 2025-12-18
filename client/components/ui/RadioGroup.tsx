@@ -52,11 +52,11 @@ export const RadioGroup = ({
                 cn(
                   'relative flex cursor-pointer rounded-xl px-5 py-4',
                   'transition-all duration-200',
-                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary-from)] focus-visible:ring-offset-2',
+                  'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-2',
                   'disabled:opacity-50 disabled:cursor-not-allowed',
                   checked
-                    ? 'glass-heavy border-2 border-[var(--primary-from)] shadow-glow-primary'
-                    : 'glass border-2 border-[var(--bg-tertiary)] hover:border-[var(--primary-from)]/50'
+                    ? 'glass-heavy ring-2 ring-accent-primary shadow-lg'
+                    : 'glass hover:ring-1 hover:ring-accent-primary/30'
                 )
               }
             >
@@ -71,7 +71,7 @@ export const RadioGroup = ({
                         as="span"
                         className={cn(
                           'text-sm font-medium',
-                          checked ? 'text-[var(--primary-from)]' : 'text-[var(--text-primary)]'
+                          checked ? 'text-accent-primary' : 'text-text-primary'
                         )}
                       >
                         {option.label}
@@ -92,8 +92,8 @@ export const RadioGroup = ({
                       'flex h-5 w-5 items-center justify-center rounded-full border-2',
                       'transition-colors duration-200',
                       checked
-                        ? 'border-[var(--primary-from)] bg-[var(--primary-from)]'
-                        : 'border-[var(--bg-tertiary)]'
+                        ? 'border-accent-primary bg-accent-primary'
+                        : 'border-glass-border'
                     )}
                     animate={{ scale: checked ? 1 : 0.9 }}
                     transition={{ duration: 0.2 }}

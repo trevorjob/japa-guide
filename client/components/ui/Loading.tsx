@@ -28,8 +28,8 @@ export const Spinner = ({ className }: { className?: string }) => {
         />
         <defs>
           <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="var(--primary-from)" />
-            <stop offset="100%" stopColor="var(--primary-to)" />
+            <stop offset="0%" stopColor="var(--accent-primary)" />
+            <stop offset="100%" stopColor="var(--accent-secondary)" />
           </linearGradient>
         </defs>
       </svg>
@@ -118,9 +118,9 @@ export const ProgressBar = ({ progress, showLabel = true, className }: ProgressB
           <span className="text-sm font-semibold text-[var(--text-primary)]">{progress}%</span>
         </div>
       )}
-      <div className="w-full h-2 bg-[var(--bg-tertiary)] rounded-full overflow-hidden">
+      <div className="w-full h-2 bg-bg-tertiary rounded-full overflow-hidden">
         <motion.div
-          className="h-full bg-gradient-to-r from-[var(--primary-from)] to-[var(--primary-to)]"
+          className="h-full bg-gradient-to-r from-accent-primary to-accent-secondary"
           initial={{ width: 0 }}
           animate={{ width: `${progress}%` }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
@@ -147,7 +147,7 @@ export const LoadingDots = () => {
       {[0, 1, 2].map((i) => (
         <motion.div
           key={i}
-          className="w-2 h-2 rounded-full bg-[var(--primary-from)]"
+          className="w-2 h-2 rounded-full bg-accent-primary"
           animate={{ y: [0, -10, 0] }}
           transition={{
             repeat: Infinity,

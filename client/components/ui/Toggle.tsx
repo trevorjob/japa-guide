@@ -43,11 +43,11 @@ export const Toggle = ({
         className={cn(
           'relative inline-flex h-6 w-11 items-center rounded-full',
           'transition-colors duration-200',
-          'focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--primary-from)] focus-visible:ring-offset-2',
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-primary focus-visible:ring-offset-2',
           'disabled:opacity-50 disabled:cursor-not-allowed',
           enabled
-            ? 'bg-gradient-to-r from-[var(--primary-from)] to-[var(--primary-to)]'
-            : 'bg-[var(--bg-tertiary)]'
+            ? 'bg-gradient-to-r from-accent-primary to-accent-secondary'
+            : 'bg-bg-tertiary'
         )}
       >
         <motion.span
