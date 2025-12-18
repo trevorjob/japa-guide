@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
+import ReactMarkdown from 'react-markdown';
 import { aiService } from '@/lib/services';
 import type { ChatMessage, ChatRequest } from '@/types';
 
@@ -136,11 +137,28 @@ export default function ChatPanel({ onClose }: { onClose?: () => void }) {
     setLoading(true);
 
     try {
+      // Build conversation history from recent messages (excluding welcome message)
+      const conversationHistory = messages
+        .filter(msg => msg.role === 'user' || (msg.role === 'assistant' && !msg.content.includes('wetin you wan know') && !msg.content.includes('Tone switched')))
+        .slice(-6) // Last 6 messages for context
+        .map(msg => ({
+          role: msg.role as 'user' | 'assistant',
+          content: msg.content,
+        }));
+      
+      // Add the current message to history
+      conversationHistory.push({
+        role: 'user',
+        content: userMsg.content,
+      });
+
       const request: ChatRequest = {
         message: userMsg.content,
         tone: selectedTone,
         context: countryCode ? { country: countryCode } : undefined,
         conversation_id: conversationId,
+        country_code: countryCode || undefined,
+        conversation_history: conversationHistory,
       };
 
       console.log('Sending chat request:', request);
@@ -306,7 +324,39 @@ export default function ChatPanel({ onClose }: { onClose?: () => void }) {
                     : 'bg-bg-secondary dark:bg-dark-bg-secondary text-text-primary'
                 }`}
               >
-                <div className="whitespace-pre-wrap wrap-break-word">{msg.content}</div>
+                {msg.role === 'assistant' ? (
+                  <div className="prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-headings:mt-3 prose-headings:mb-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-strong:text-inherit">
+                    <ReactMarkdown
+                      components={{
+                        // Custom styling for markdown elements
+                        h1: ({ children }) => <h3 className="text-base font-bold mt-3 mb-1">{children}</h3>,
+                        h2: ({ children }) => <h4 className="text-sm font-bold mt-2 mb-1">{children}</h4>,
+                        h3: ({ children }) => <h5 className="text-sm font-semibold mt-2 mb-1">{children}</h5>,
+                        p: ({ children }) => <p className="my-1 text-sm leading-relaxed">{children}</p>,
+                        ul: ({ children }) => <ul className="my-1 ml-4 list-disc space-y-0.5">{children}</ul>,
+                        ol: ({ children }) => <ol className="my-1 ml-4 list-decimal space-y-0.5">{children}</ol>,
+                        li: ({ children }) => <li className="text-sm">{children}</li>,
+                        strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                        em: ({ children }) => <em className="italic">{children}</em>,
+                        a: ({ href, children }) => (
+                          <a href={href} target="_blank" rel="noopener noreferrer" className="text-accent-primary underline hover:text-accent-secondary">
+                            {children}
+                          </a>
+                        ),
+                        hr: () => <hr className="my-2 border-glass-border" />,
+                        blockquote: ({ children }) => (
+                          <blockquote className="border-l-2 border-accent-primary pl-2 my-2 italic text-text-secondary">
+                            {children}
+                          </blockquote>
+                        ),
+                      }}
+                    >
+                      {msg.content}
+                    </ReactMarkdown>
+                  </div>
+                ) : (
+                  <div className="whitespace-pre-wrap wrap-break-word text-sm">{msg.content}</div>
+                )}
                 <div
                   className={`text-xs mt-1 ${
                     msg.role === 'user' ? 'text-white/70' : 'text-text-tertiary'

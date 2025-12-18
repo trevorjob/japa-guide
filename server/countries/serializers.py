@@ -38,10 +38,10 @@ class CountryDetailSerializer(serializers.ModelSerializer):
             'gdp_per_capita_usd', 'unemployment_rate', 'life_expectancy', 'literacy_rate',
             
             # Visa Info
-            'visa_summary', 'visa_types_count', 'visa_last_reviewed',
+            'visa_summary', 'visa_types_count', 'visa_last_reviewed', 'immigration_url',
             
             # Data Quality & Tracking
-            'data_quality_score', 'needs_review', 'is_featured',
+            'data_quality_score', 'data_confidence', 'needs_review', 'is_featured',
             'basic_data_source', 'basic_data_last_synced',
             'migration_data_source', 'migration_data_last_synced',
             'economic_data_source', 'economic_data_last_synced',

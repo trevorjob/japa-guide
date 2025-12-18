@@ -154,6 +154,10 @@ class Country(models.Model):
     visa_summary = models.TextField(blank=True, help_text="Manual summary of visa options")
     visa_types_count = models.IntegerField(default=0, help_text="Number of visa types available")
     visa_last_reviewed = models.DateField(null=True, blank=True)
+    immigration_url = models.URLField(
+        blank=True,
+        help_text="Official government immigration website URL"
+    )
     
     # Data Source Tracking
     basic_data_source = models.CharField(max_length=50, default='rest_countries')

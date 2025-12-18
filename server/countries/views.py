@@ -4,8 +4,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from django_filters.rest_framework import DjangoFilterBackend
 from django_filters import rest_framework as df_filters
-from .models import Country
-from .serializers import CountryListSerializer, CountryDetailSerializer
+from .models import Country, CountryDocument
+from .serializers import CountryListSerializer, CountryDetailSerializer, CountryDocumentSerializer
 
 
 class CountryFilter(df_filters.FilterSet):
@@ -138,3 +138,28 @@ class CountryViewSet(viewsets.ReadOnlyModelViewSet):
                 'description': f'Save ${round(total_cost / 12, 2)}/month for 12 months to reach your goal'
             }
         })
+    
+    @action(detail=True, methods=['get'], url_path='documents')
+    def documents(self, request, code=None):
+        """
+        Get all documents for this country.
+        GET /api/v1/countries/{code}/documents/
+        
+        Query params:
+        - doc_type: Filter by document type (overview, work, study, family, citizenship, visas)
+        """
+        country = self.get_object()
+        doc_type = request.query_params.get('doc_type')
+        
+        queryset = CountryDocument.objects.filter(
+            country=country,
+            needs_review=False
+        ).select_related('source')
+        
+        if doc_type:
+            queryset = queryset.filter(doc_type=doc_type)
+        
+        queryset = queryset.order_by('doc_type', '-updated_at')
+        
+        serializer = CountryDocumentSerializer(queryset, many=True)
+        return Response(serializer.data)

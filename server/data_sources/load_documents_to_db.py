@@ -101,7 +101,7 @@ class DocumentLoader:
             existing.content = content
             existing.source = source
             existing.data_confidence = 'high'  # From official sources
-            existing.needs_review = True  # Still mark for manual review
+            existing.needs_review = False  # Auto-approved from official sources
             existing.updated_at = timezone.now()
             if not self.dry_run:
                 existing.save()
@@ -114,7 +114,7 @@ class DocumentLoader:
                 doc_type=doc_type,
                 source=source,
                 data_confidence='high',
-                needs_review=True,
+                needs_review=False,  # Auto-approved from official sources
             )
             if not self.dry_run:
                 doc.save()

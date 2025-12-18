@@ -64,19 +64,15 @@ MAX_RETRIES = 3
 
 
 class WebScraper:
-    """Handles web scraping with caching and rate limiting."""
+    """Handles web scraping with ZenRows API, caching and rate limiting."""
     
-    HEADERS = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
-        'Accept-Language': 'en-US,en;q=0.5',
-    }
+    ZENROWS_API_KEY = '02a1aab3dcecde92a6ae4bf08bccb6cfcc86ccb2'
+    ZENROWS_API_URL = 'https://api.zenrows.com/v1/'
     
     def __init__(self, use_cache: bool = True, cache_duration_hours: int = 24):
         self.use_cache = use_cache
         self.cache_duration = cache_duration_hours * 3600
         self.session = requests.Session()
-        self.session.headers.update(self.HEADERS)
         self.last_request_time = 0
     
     def _get_cache_path(self, url: str) -> Path:
@@ -101,7 +97,7 @@ class WebScraper:
     
     def fetch_url(self, url: str) -> Optional[str]:
         """
-        Fetch URL content with caching and rate limiting.
+        Fetch URL content using ZenRows API with caching and rate limiting.
         Returns extracted text content or None on failure.
         """
         cache_path = self._get_cache_path(url)
@@ -116,34 +112,25 @@ class WebScraper:
         # Rate limit
         self._rate_limit()
         
-        # Fetch
+        # Fetch using ZenRows API
         for attempt in range(MAX_RETRIES):
             try:
-                logger.info(f"Fetching: {url} (attempt {attempt + 1})")
-                response = self.session.get(url, timeout=30)
+                logger.info(f"Fetching via ZenRows: {url} (attempt {attempt + 1})")
+                
+                params = {
+                    'url': url,
+                    'apikey': self.ZENROWS_API_KEY,
+                    'response_type': 'plaintext',  # Get clean text directly
+                }
+                
+                response = self.session.get(self.ZENROWS_API_URL, params=params, timeout=60)
                 response.raise_for_status()
                 
-                # Parse and extract text
-                soup = BeautifulSoup(response.text, 'html.parser')
+                # ZenRows returns plaintext directly with response_type=plaintext
+                text = response.text
                 
-                # Remove unwanted elements
-                for tag in soup(['script', 'style', 'nav', 'footer', 'header', 'aside', 'form', 'iframe']):
-                    tag.decompose()
-                
-                # Try to find main content
-                main_content = (
-                    soup.find('main') or 
-                    soup.find('article') or 
-                    soup.find('div', class_=['content', 'main-content', 'page-content']) or
-                    soup.find('div', id=['content', 'main', 'main-content']) or
-                    soup.body
-                )
-                
-                if main_content:
-                    # Get text with better formatting
-                    text = self._extract_text(main_content)
-                else:
-                    text = soup.get_text(separator='\n', strip=True)
+                # Clean up the text
+                text = self._clean_text(text)
                 
                 # Cache the result
                 cache_data = {
@@ -154,35 +141,41 @@ class WebScraper:
                 with open(cache_path, 'w', encoding='utf-8') as f:
                     json.dump(cache_data, f, ensure_ascii=False, indent=2)
                 
+                logger.info(f"Successfully fetched {len(text)} chars from {url}")
                 return text
                 
             except requests.RequestException as e:
-                logger.warning(f"Request failed for {url}: {e}")
+                logger.warning(f"ZenRows request failed for {url}: {e}")
                 if attempt < MAX_RETRIES - 1:
                     time.sleep(2 ** attempt)  # Exponential backoff
                     
         logger.error(f"Failed to fetch {url} after {MAX_RETRIES} attempts")
         return None
     
-    def _extract_text(self, element) -> str:
-        """Extract text with better formatting from BeautifulSoup element."""
-        texts = []
+    def _clean_text(self, text: str) -> str:
+        """Clean up extracted text."""
+        import re
         
-        for child in element.descendants:
-            if child.name in ['h1', 'h2', 'h3', 'h4', 'h5', 'h6']:
-                texts.append(f"\n## {child.get_text(strip=True)}\n")
-            elif child.name == 'p':
-                text = child.get_text(strip=True)
-                if text:
-                    texts.append(text + '\n')
-            elif child.name == 'li':
-                text = child.get_text(strip=True)
-                if text:
-                    texts.append(f"• {text}")
-            elif child.name in ['br']:
-                texts.append('\n')
+        # Remove excessive whitespace
+        text = re.sub(r'\n\s*\n\s*\n+', '\n\n', text)
+        text = re.sub(r'[ \t]+', ' ', text)
         
-        return '\n'.join(texts)
+        # Remove common navigation/footer patterns
+        lines = text.split('\n')
+        cleaned_lines = []
+        skip_patterns = ['cookie', 'privacy policy', 'terms of use', 'copyright', 'all rights reserved']
+        
+        for line in lines:
+            line_lower = line.lower().strip()
+            # Skip very short lines that are likely navigation
+            if len(line.strip()) < 3:
+                continue
+            # Skip lines that are just navigation items
+            if line_lower in ['home', 'back', 'next', 'previous', 'menu', 'search']:
+                continue
+            cleaned_lines.append(line)
+        
+        return '\n'.join(cleaned_lines).strip()
 
 
 class DocumentGenerator:

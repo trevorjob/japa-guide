@@ -1,0 +1,81 @@
+{
+  "processed_at": "2025-12-17T23:49:27.614760",
+  "total_countries": 15,
+  "results": {
+    "CAN": {
+      "country_name": "Canada",
+      "documents_generated": 5,
+      "status": "success"
+    },
+    "USA": {
+      "country_name": "United States",
+      "documents_generated": 5,
+      "status": "success"
+    },
+    "GBR": {
+      "country_name": "United Kingdom",
+      "documents_generated": 5,
+      "status": "success"
+    },
+    "AUS": {
+      "country_name": "Australia",
+      "documents_generated": 4,
+      "status": "success"
+    },
+    "DEU": {
+      "country_name": "Germany",
+      "documents_generated": 4,
+      "status": "success"
+    },
+    "IRL": {
+      "country_name": "Ireland",
+      "documents_generated": 5,
+      "status": "success"
+    },
+    "NLD": {
+      "country_name": "Netherlands",
+      "documents_generated": 3,
+      "status": "success"
+    },
+    "NZL": {
+      "country_name": "New Zealand",
+      "documents_generated": 2,
+      "status": "success"
+    },
+    "FRA": {
+      "country_name": "France",
+      "documents_generated": 4,
+      "status": "success"
+    },
+    "PRT": {
+      "country_name": "Portugal",
+      "documents_generated": 5,
+      "status": "success"
+    },
+    "ARE": {
+      "country_name": "United Arab Emirates",
+      "documents_generated": 4,
+      "status": "success"
+    },
+    "SGP": {
+      "country_name": "Singapore",
+      "documents_generated": 2,
+      "status": "success"
+    },
+    "JPN": {
+      "country_name": "Japan",
+      "documents_generated": 5,
+      "status": "success"
+    },
+    "ZAF": {
+      "country_name": "South Africa",
+      "documents_generated": 1,
+      "status": "success"
+    },
+    "CHE": {
+      "country_name": "Switzerland",
+      "documents_generated": 3,
+      "status": "success"
+    }
+  }
+}

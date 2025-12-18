@@ -63,6 +63,7 @@ export interface Country {
   visa_summary?: string;
   visa_types_count?: number;
   visa_last_reviewed?: string | null;
+  immigration_url?: string;
   
   // Data Quality & Tracking
   data_quality_score?: number;
@@ -93,6 +94,8 @@ export interface VisaType {
   duration_months?: number | null;
   cost: number;
   cost_usd?: string;
+  cost_estimate_min?: number;
+  cost_estimate_max?: number;
   success_rate: number | null;
   requirements: string | string[];
   restrictions: string | string[];
@@ -255,12 +258,24 @@ export interface ChatRequest {
     roadmap_id?: number;
   };
   conversation_id?: number;
+  country_code?: string;
+  conversation_history?: Array<{
+    role: 'user' | 'assistant';
+    content: string;
+  }>;
 }
 
 export interface ChatResponse {
   response: string;
   conversation_id: number;
   tone: string;
+  sources?: Array<{
+    country: string;
+    title: string;
+    source: string;
+  }>;
+  countries_detected?: string[];
+  focused_country?: string;
 }
 
 export interface Story {

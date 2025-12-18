@@ -93,7 +93,7 @@ export default function VisaRouteModal({ visa, isOpen, onClose, onGenerateRoadma
                         <h4 className="text-sm font-semibold text-text-secondary">Processing Time</h4>
                       </div>
                       <p className="text-lg font-bold text-text-primary">
-                        {visa.processing_time_min}-{visa.processing_time_max} months
+                        {visa.processing_time_min}-{visa.processing_time_max} weeks
                       </p>
                     </div>
                   )}
@@ -114,7 +114,7 @@ export default function VisaRouteModal({ visa, isOpen, onClose, onGenerateRoadma
                   )}
 
                   {/* Cost */}
-                  {visa.cost_usd && (
+                  {(visa.cost_estimate_min || visa.cost_estimate_max) && (
                     <div className="p-4 bg-bg-secondary dark:bg-dark-bg-secondary rounded-xl">
                       <div className="flex items-center gap-2 mb-2">
                         <svg className="w-5 h-5 text-accent-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -122,7 +122,11 @@ export default function VisaRouteModal({ visa, isOpen, onClose, onGenerateRoadma
                         </svg>
                         <h4 className="text-sm font-semibold text-text-secondary">Application Fee</h4>
                       </div>
-                      <p className="text-lg font-bold text-text-primary">${visa.cost_usd}</p>
+                      <p className="text-lg font-bold text-text-primary">
+                        {visa.cost_estimate_min === visa.cost_estimate_max
+                          ? `$${visa.cost_estimate_min?.toLocaleString()}`
+                          : `$${visa.cost_estimate_min?.toLocaleString()} - $${visa.cost_estimate_max?.toLocaleString()}`}
+                      </p>
                     </div>
                   )}
 

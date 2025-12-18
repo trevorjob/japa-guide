@@ -1,0 +1,37 @@
+{
+  "country_code": "ZAF",
+  "country_name": "South Africa",
+  "agency": "Department of Home Affairs",
+  "portal_url": "https://www.dha.gov.za/",
+  "processed_at": "2025-12-17T23:45:48.287549",
+  "documents": {
+    "overview": {
+      "title": "Immigration Overview: South Africa",
+      "content": "# Immigration Overview: South Africa\n\n## 1. Overview\n\nSouth Africa is a destination for international travelers seeking temporary visits for tourism, business, family visits, study, and other specific purposes. The country's immigration system is managed by the Department of Home Affairs (DHA), which grants various types of visas and permits. A South African visa indicates that an application has been reviewed at an embassy, mission, or consulate and that the applicant is preliminarily eligible to enter for a specific purpose. However, final entry and the duration of stay are determined by an immigration official at the port of entry.\n\nThe visa serves as a visitor's permit upon entry, with its validity calculated from the date of arrival. Travelers are restricted to the activity or purpose for which their visa was issued. It is critical to apply for the correct visa, as entry may be refused if the purpose of the visit is not correctly stated. Requirements and exempt country lists are subject to change, and applications are treated on an individual basis.\n\n## 2. Main Immigration Pathways\n\nBased on the official source, the main temporary residence visa categories include:\n\n*   **Visitors' Visas:** For temporary stays of 90 days or less for purposes such as tourism, visiting family/friends, business, short-term study, conferences, charitable activities, research, or medical treatment (lifesaving treatment, maximum 3 months). Specific short-term work visas exist for the entertainment industry (typically 30-90 days).\n*   **Business Visa:** For foreigners intending to invest in the South African economy by establishing a new business or investing in an existing one. A prescribed financial capital contribution and a certificate from a chartered accountant are among the requirements.\n*   **Work Visas:** The source lists several types, including:\n    *   General Work Visa\n    *   Critical Skills Work Visa\n    *   Intra-company Transfer Work Visa\n    *   Corporate Visas\n*   **Study Visas:** For those intending to study in South Africa.\n*   **Relative’s Visa:** For joining family members in South Africa.\n*   **Retired Persons’ Visa:** For retirees wishing to reside in South Africa.\n*   **Medical Treatment Visa:** For those seeking medical treatment for periods longer than three months (distinct from the short-term medical visitor's visa).\n*   **Other Temporary Visas:** Including visas for cultural/economic/social exchange programs, crew (maritime), and compliance with treaty conditions.\n\n**Permanent Residency** is a separate category mentioned, but specific pathways and requirements are not detailed in the provided source content.\n\n## 3. Who This Country Is Suitable For\n\n*   **Short-Term Business Visitors and Tourists:** Citizens of visa-exempt countries (verify current list) or those who can obtain a visitor's visa for tourism, conferences, or short business engagements.\n*   **Skilled Professionals:** Individuals with qualifications and experience in fields listed on the Critical Skills list may be eligible for a Critical Skills Work Visa.\n*   **International Investors and Entrepreneurs:** Those with the required capital to start or invest in a business in South Africa, as per the Business Visa requirements.\n*   **International Students:** Individuals accepted into a South African educational institution for full-time study.\n*   **Retirees:** Persons who wish to retire in South Africa and can meet the financial requirements for a Retired Persons’ Visa (specific requirements not detailed in source).\n\n## 4. Known Challenges\n\n*   **Complex and Changing Requirements:** Visa requirements differ by country and are explicitly stated to be **subject to change**. The list of visa-exempt countries may also change without notice. Each application is treated individually, adding a layer of case-by-case assessment.\n*   **Strict Documentation Rules:** Applications require extensive documentation, such as police clearance certificates, medical reports, proof of financial means, and, for minors, unabridged birth certificates and consent letters. Incomplete applications may lead to refusal.\n*   **No Visa Issuance at Ports of Entry:** Visas are **not** issued upon arrival. Airline officials must insist on a visa before allowing boarding. Arriving without the required visa typically results in being placed on a return flight.\n*   **Final Authority at Entry:** Possessing a visa does not guarantee entry. An immigration officer at the port of entry has the final authority to determine admissibility and the permitted length of stay for that visit.\n\n## 5. Important Notes\n\n*   **Verify Everything:** This document is a summary based on a single official source. **You must verify all information, including current visa requirements, fees, exempt country lists, and application forms, directly with your nearest South African embassy, mission, consulate, or the Department of Home Affairs.** Policies and regulations are frequently updated.\n*   **Application Timing:** Apply well in advance. Some visas, like the Business Visa, must be applied for no less than 60 days before the expiry of a current visa.\n*   **Passport Validity:** Your passport must be valid for no less than 30 days **after** the expiry date of your intended visit and must have at least one unused page for endorsements.\n*   **Financial Proof:** You must provide proof of sufficient financial means to cover your day-to-day expenses during your stay.\n*   **Yellow Fever:** A vaccination certificate is required if your journey starts or passes through a yellow fever endemic area.\n*   **Disclaimer:** Immigration rules are complex and subject to frequent change. The information provided here is for general guidance only and does not constitute legal advice. Always consult the official Department of Home Affairs website or an accredited immigration practitioner for your specific circumstances.",
+      "doc_type": "overview",
+      "word_count": 871,
+      "generated_at": "2025-12-17T23:46:24.683087",
+      "tokens_used": 3892,
+      "source_urls": [
+        "https://www.dha.gov.za/index.php/immigration-services/types-of-visas"
+      ],
+      "status": "success"
+    },
+    "work": {
+      "status": "failed",
+      "error": "No content could be scraped from sources"
+    },
+    "study": {
+      "status": "failed",
+      "error": "No content could be scraped from sources"
+    },
+    "family": {
+      "status": "failed",
+      "error": "No content could be scraped from sources"
+    },
+    "citizenship": {
+      "status": "failed",
+      "error": "No content could be scraped from sources"
+    }
+  }
+}

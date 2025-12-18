@@ -17,9 +17,18 @@ class AIChatRequestSerializer(serializers.Serializer):
     message = serializers.CharField(required=True)
     tone = serializers.ChoiceField(
         choices=['helpful', 'uncle_japa', 'bestie', 'strict_officer', 'hype_man', 'therapist'],
-        default='helpful'
+        default='uncle_japa'
     )
     context = serializers.JSONField(required=False, default=dict)
+    country_code = serializers.CharField(required=False, allow_null=True, help_text="Specific country code to focus on")
+    use_rag = serializers.BooleanField(required=False, default=True, help_text="Whether to use RAG for context")
+    conversation_history = serializers.ListField(
+        child=serializers.DictField(),
+        required=False,
+        default=list,
+        help_text="Previous messages in the conversation for context"
+    )
+    conversation_id = serializers.IntegerField(required=False, allow_null=True)
 
 
 class AICompareRequestSerializer(serializers.Serializer):
