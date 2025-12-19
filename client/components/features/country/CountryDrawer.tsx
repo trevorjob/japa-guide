@@ -159,7 +159,9 @@ export default function CountryDrawer({ countryCode, isOpen, onClose, onChatOpen
                   />
                 )}
                 <h2 className="text-xl font-bold text-text-primary">
-                  {loading ? 'Loading...' : countryData?.name || countryCode.toUpperCase()}
+                  {loading
+                    ? 'Loading...'
+                    : countryData?.name || (countryCode ? countryCode.toUpperCase() : '')}
                 </h2>
               </div>
 
