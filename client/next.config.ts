@@ -1,7 +1,15 @@
 import type { NextConfig } from "next";
 
+
+import path from 'path';
+
 const nextConfig: NextConfig = {
-  // Remove turbo config - use built-in Turbopack automatically
+  webpack(config) {
+    config.resolve = config.resolve || {};
+    config.resolve.alias = config.resolve.alias || {};
+    config.resolve.alias['@'] = path.resolve(__dirname, '.');
+    return config;
+  },
 };
 
 export default nextConfig;
