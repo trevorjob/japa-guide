@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { countryService, visaService } from '@/lib/services';
 import type { Country, VisaType } from '@/types';
 import { Spinner } from '@/components/ui/Loading';
@@ -20,6 +20,7 @@ interface CountryDrawerProps {
 
 export default function CountryDrawer({ countryCode, isOpen, onClose, onChatOpen }: CountryDrawerProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [countryData, setCountryData] = useState<Country | null>(null);
   const [visaRoutes, setVisaRoutes] = useState<VisaType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,16 +33,16 @@ export default function CountryDrawer({ countryCode, isOpen, onClose, onChatOpen
 
   const fetchCountryData = useCallback(async () => {
     if (!countryCode) return;
-    
+
     try {
       setLoading(true);
       setError(null);
-      
+
       // Fetch only country details first for fast drawer opening
       const country = await countryService.getByCode(countryCode.toUpperCase());
       setCountryData(country);
       setLoading(false);
-      
+
       // Load visa routes in background after drawer is shown
       setVisaLoading(true);
       try {
@@ -53,7 +54,7 @@ export default function CountryDrawer({ countryCode, isOpen, onClose, onChatOpen
       } finally {
         setVisaLoading(false);
       }
-      
+
     } catch (err) {
       console.error('Error fetching country data:', err);
       setError('Failed to load country data');
@@ -64,8 +65,16 @@ export default function CountryDrawer({ countryCode, isOpen, onClose, onChatOpen
   useEffect(() => {
     if (isOpen && countryCode) {
       fetchCountryData();
+
+      // Handle action param
+      const action = searchParams.get('action');
+      if (action === 'roadmap') {
+        setIsRoadmapWizardOpen(true);
+      } else if (action === 'calculate') {
+        setIsCostCalculatorOpen(true);
+      }
     }
-  }, [countryCode, isOpen, fetchCountryData]);
+  }, [countryCode, isOpen, fetchCountryData, searchParams]);
 
   const handleClose = () => {
     onClose();
@@ -132,7 +141,7 @@ export default function CountryDrawer({ countryCode, isOpen, onClose, onChatOpen
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
-            transition={{ 
+            transition={{
               type: 'spring',
               damping: 30,
               stiffness: 300,
@@ -152,10 +161,10 @@ export default function CountryDrawer({ countryCode, isOpen, onClose, onChatOpen
 
               <div className="flex items-center gap-3">
                 {(countryData?.flag_svg_url || countryData?.flag_image) && (
-                  <img 
-                    src={countryData.flag_svg_url || countryData.flag_image || ''} 
-                    alt={`${countryData.name} flag`} 
-                    className="w-8 h-6 object-cover rounded" 
+                  <img
+                    src={countryData.flag_svg_url || countryData.flag_image || ''}
+                    alt={`${countryData.name} flag`}
+                    className="w-8 h-6 object-cover rounded"
                   />
                 )}
                 <h2 className="text-xl font-bold text-text-primary">
@@ -199,11 +208,11 @@ export default function CountryDrawer({ countryCode, isOpen, onClose, onChatOpen
 
             {/* Content */}
             {!loading && !error && countryData && (
-              <motion.div 
+              <motion.div
                 className="p-6 space-y-6"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ 
+                transition={{
                   duration: 0.5,
                   delay: 0.2,
                   ease: [0.25, 0.1, 0.25, 1]
@@ -211,7 +220,7 @@ export default function CountryDrawer({ countryCode, isOpen, onClose, onChatOpen
               >
                 {/* Hero Image (if available) */}
                 {countryData.hero_image && (
-                  <motion.div 
+                  <motion.div
                     className="relative h-48 -mx-6 -mt-6 mb-6"
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -272,10 +281,10 @@ export default function CountryDrawer({ countryCode, isOpen, onClose, onChatOpen
                       </div>
                     </div>
                   </div>
-                  
+
                   {/* Data Transparency Badge */}
                   <div className="mt-4">
-                    <DataTransparencyBadge 
+                    <DataTransparencyBadge
                       confidence={countryData.data_confidence || 'low'}
                       needsReview={countryData.needs_review}
                       lastUpdated={countryData.updated_at}
@@ -283,7 +292,7 @@ export default function CountryDrawer({ countryCode, isOpen, onClose, onChatOpen
                       isTier1={TIER_1_COUNTRIES.has(countryData.code)}
                     />
                   </div>
-                  
+
                   {/* Official Immigration Site Link */}
                   {countryData.immigration_url && (
                     <div className="mt-3">
@@ -337,7 +346,7 @@ export default function CountryDrawer({ countryCode, isOpen, onClose, onChatOpen
                         </div>
                       )}
                     </div>
-                    </motion.div>
+                  </motion.div>
                 )}
 
                 {/* Key Statistics */}
@@ -481,34 +490,34 @@ export default function CountryDrawer({ countryCode, isOpen, onClose, onChatOpen
                 <div>
                   <h3 className="text-sm font-semibold text-text-secondary mb-3">Actions</h3>
                   <div className="space-y-3">
-                  <motion.button
-                    onClick={() => handleAction('calculate')}
-                    className="w-full px-6 py-3 bg-gradient-to-r from-accent-primary to-accent-secondary text-white font-semibold rounded-full shadow-card hover:shadow-card-hover transition-shadow"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    Calculate Full Costs
-                  </motion.button>
+                    <motion.button
+                      onClick={() => handleAction('calculate')}
+                      className="w-full px-6 py-3 bg-gradient-to-r from-accent-primary to-accent-secondary text-white font-semibold rounded-full shadow-card hover:shadow-card-hover transition-shadow"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      Calculate Full Costs
+                    </motion.button>
 
-                  <motion.button
-                    onClick={() => handleAction('roadmap')}
-                    className="w-full px-6 py-3 bg-bg-secondary dark:bg-dark-bg-secondary border-2 border-accent-primary text-text-primary font-semibold rounded-full hover:bg-accent-primary hover:text-white transition-colors"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    Generate Roadmap
-                  </motion.button>
+                    <motion.button
+                      onClick={() => handleAction('roadmap')}
+                      className="w-full px-6 py-3 bg-bg-secondary dark:bg-dark-bg-secondary border-2 border-accent-primary text-text-primary font-semibold rounded-full hover:bg-accent-primary hover:text-white transition-colors"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      Generate Roadmap
+                    </motion.button>
 
-                  <motion.button
-                    onClick={() => onChatOpen && onChatOpen()}
-                    className="w-full px-6 py-3 bg-bg-secondary dark:bg-dark-bg-secondary text-text-primary font-medium rounded-full hover:bg-bg-tertiary dark:hover:bg-dark-bg-tertiary transition-colors"
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    Ask AI About {countryData.name}
-                  </motion.button>
+                    <motion.button
+                      onClick={() => onChatOpen && onChatOpen()}
+                      className="w-full px-6 py-3 bg-bg-secondary dark:bg-dark-bg-secondary text-text-primary font-medium rounded-full hover:bg-bg-tertiary dark:hover:bg-dark-bg-tertiary transition-colors"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      Ask AI About {countryData.name}
+                    </motion.button>
+                  </div>
                 </div>
-              </div>
               </motion.div>
             )}
           </motion.div>

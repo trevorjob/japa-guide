@@ -1,9 +1,9 @@
 'use client';
 
-import React, { Suspense, useState, useCallback } from 'react';
+import React, { Suspense, useState, useCallback, useEffect } from 'react';
 import dynamic from 'next/dynamic';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Spinner } from '@/components/ui/Loading';
-import GlassButton from '@/components/ui/GlassButton';
 
 // Lazy load heavy components
 const MapCanvas = dynamic(() => import('@/components/features/map/MapCanvas'), {
@@ -32,32 +32,44 @@ const ChatPanel = dynamic(() => import('@/components/features/chat/ChatPanel'), 
 });
 
 function MapPageContent() {
-  const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
-  const [chatOpen, setChatOpen] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const [selectedCountry, setSelectedCountry] = useState<string | null>(searchParams.get('country'));
+  const [chatOpen, setChatOpen] = useState(searchParams.get('chat') === 'true');
   const [mapFilters, setMapFilters] = useState<{
     region?: string;
     search?: string;
   }>({});
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
 
-  // Update URL without page reload
-  const updateURL = (params: { country?: string | null; chat?: boolean }) => {
-    const url = new URL(window.location.href);
+  // Sync state with URL params
+  const updateURL = useCallback((params: { country?: string | null; chat?: boolean }) => {
+    const newParams = new URLSearchParams(searchParams.toString());
 
     if (params.country) {
-      url.searchParams.set('country', params.country);
+      newParams.set('country', params.country);
     } else if (params.country === null) {
-      url.searchParams.delete('country');
+      newParams.delete('country');
     }
 
     if (params.chat === true) {
-      url.searchParams.set('chat', 'true');
+      newParams.set('chat', 'true');
     } else if (params.chat === false) {
-      url.searchParams.delete('chat');
+      newParams.delete('chat');
     }
 
-    window.history.pushState({}, '', url.toString());
-  };
+    router.push(`?${newParams.toString()}`);
+  }, [router, searchParams]);
+
+  // React to external URL changes (e.g. back button or deep links)
+  useEffect(() => {
+    const country = searchParams.get('country');
+    const chat = searchParams.get('chat') === 'true';
+
+    setSelectedCountry(country);
+    setChatOpen(chat);
+  }, [searchParams]);
 
   const handleCountrySelect = useCallback((countryCode: string) => {
     setSelectedCountry(countryCode);

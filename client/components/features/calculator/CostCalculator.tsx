@@ -17,7 +17,7 @@ export default function CostCalculator({ country, isOpen, onClose }: CostCalcula
   const [step, setStep] = useState(1);
   const [calculating, setCalculating] = useState(false);
   const [results, setResults] = useState<CostCalculation | null>(null);
-  
+
   const [formData, setFormData] = useState<CostCalculatorFormData>({
     lifestyle: 'moderate',
     accommodation: 'studio',
@@ -29,7 +29,7 @@ export default function CostCalculator({ country, isOpen, onClose }: CostCalcula
 
   const calculateCosts = async () => {
     setCalculating(true);
-    
+
     try {
       // Try to use backend calculation endpoint
       const result = await countryService.calculateCost(country.code, formData);
@@ -37,19 +37,19 @@ export default function CostCalculator({ country, isOpen, onClose }: CostCalcula
       setStep(3);
     } catch (err) {
       console.error('Backend calculation failed, using frontend fallback:', err);
-      
+
       // Fallback to frontend calculation
       const baseRent = parseFloat(country.avg_rent_monthly_usd || '1000');
       const baseMeal = parseFloat(country.avg_meal_cost_usd || '15');
       const baseHealthcare = parseFloat(country.healthcare_monthly_usd || '100');
-      
+
       const lifestyleMultipliers = { budget: 0.7, moderate: 1.0, comfortable: 1.4, luxury: 2.0 };
       const accommodationMultipliers = { shared: 0.5, studio: 1.0, one_bed: 1.3, two_bed: 1.7 };
       const diningMultipliers = { cook_home: 0.6, mix: 1.0, eat_out: 1.8 };
       const transportMultipliers = { public: 0.3, mix: 0.6, car: 1.2 };
-      
+
       const lifestyleFactor = lifestyleMultipliers[formData.lifestyle];
-      
+
       const housing = baseRent * accommodationMultipliers[formData.accommodation] * lifestyleFactor;
       const food = baseMeal * 30 * diningMultipliers[formData.dining] * lifestyleFactor * (1 + formData.dependents * 0.5);
       const transportation = 100 * transportMultipliers[formData.transportation] * lifestyleFactor;
@@ -57,10 +57,10 @@ export default function CostCalculator({ country, isOpen, onClose }: CostCalcula
       const healthcare = baseHealthcare * (1 + formData.dependents);
       const entertainment = 200 * lifestyleFactor;
       const visa_fees = 500;
-      
+
       const total_monthly = housing + food + transportation + utilities + healthcare + entertainment;
       const total_cost = (total_monthly * formData.duration_months) + visa_fees;
-      
+
       setResults({
         country: {
           code: country.code,
@@ -156,9 +156,8 @@ export default function CostCalculator({ country, isOpen, onClose }: CostCalcula
                       {[1, 2, 3].map((s) => (
                         <div
                           key={s}
-                          className={`h-1.5 flex-1 rounded-full transition-colors ${
-                            s <= step ? 'bg-accent-primary' : 'bg-bg-tertiary dark:bg-dark-bg-tertiary'
-                          }`}
+                          className={`h-1.5 flex-1 rounded-full transition-colors ${s <= step ? 'bg-accent-primary' : 'bg-bg-tertiary dark:bg-dark-bg-tertiary'
+                            }`}
                         />
                       ))}
                     </div>
@@ -186,7 +185,7 @@ export default function CostCalculator({ country, isOpen, onClose }: CostCalcula
                   >
                     <div>
                       <h3 className="text-lg font-semibold text-text-primary mb-4">Lifestyle Preferences</h3>
-                      
+
                       {/* Lifestyle */}
                       <div className="mb-6">
                         <label className="block text-sm font-medium text-text-secondary mb-3">Lifestyle</label>
@@ -200,11 +199,10 @@ export default function CostCalculator({ country, isOpen, onClose }: CostCalcula
                             <button
                               key={option.value}
                               onClick={() => setFormData({ ...formData, lifestyle: option.value as CostCalculatorFormData['lifestyle'] })}
-                              className={`p-4 rounded-xl border-2 transition-all ${
-                                formData.lifestyle === option.value
+                              className={`p-4 rounded-xl border-2 transition-all ${formData.lifestyle === option.value
                                   ? 'border-accent-primary bg-accent-primary/10'
                                   : 'border-bg-tertiary dark:border-dark-bg-tertiary hover:border-accent-primary/50'
-                              }`}
+                                }`}
                             >
                               <div className="text-2xl mb-1">{option.emoji}</div>
                               <div className="text-sm font-medium text-text-primary">{option.label}</div>
@@ -226,11 +224,10 @@ export default function CostCalculator({ country, isOpen, onClose }: CostCalcula
                             <button
                               key={option.value}
                               onClick={() => setFormData({ ...formData, accommodation: option.value as CostCalculatorFormData['accommodation'] })}
-                              className={`p-4 rounded-xl border-2 transition-all ${
-                                formData.accommodation === option.value
+                              className={`p-4 rounded-xl border-2 transition-all ${formData.accommodation === option.value
                                   ? 'border-accent-primary bg-accent-primary/10'
                                   : 'border-bg-tertiary dark:border-dark-bg-tertiary hover:border-accent-primary/50'
-                              }`}
+                                }`}
                             >
                               <div className="text-2xl mb-1">{option.emoji}</div>
                               <div className="text-sm font-medium text-text-primary">{option.label}</div>
@@ -262,11 +259,10 @@ export default function CostCalculator({ country, isOpen, onClose }: CostCalcula
                           <button
                             key={option.value}
                             onClick={() => setFormData({ ...formData, dining: option.value as CostCalculatorFormData['dining'] })}
-                            className={`p-4 rounded-xl border-2 transition-all ${
-                              formData.dining === option.value
+                            className={`p-4 rounded-xl border-2 transition-all ${formData.dining === option.value
                                 ? 'border-accent-primary bg-accent-primary/10'
                                 : 'border-bg-tertiary dark:border-dark-bg-tertiary hover:border-accent-primary/50'
-                            }`}
+                              }`}
                           >
                             <div className="text-2xl mb-1">{option.emoji}</div>
                             <div className="text-sm font-medium text-text-primary">{option.label}</div>
@@ -287,11 +283,10 @@ export default function CostCalculator({ country, isOpen, onClose }: CostCalcula
                           <button
                             key={option.value}
                             onClick={() => setFormData({ ...formData, transportation: option.value as CostCalculatorFormData['transportation'] })}
-                            className={`p-4 rounded-xl border-2 transition-all ${
-                              formData.transportation === option.value
+                            className={`p-4 rounded-xl border-2 transition-all ${formData.transportation === option.value
                                 ? 'border-accent-primary bg-accent-primary/10'
                                 : 'border-bg-tertiary dark:border-dark-bg-tertiary hover:border-accent-primary/50'
-                            }`}
+                              }`}
                           >
                             <div className="text-2xl mb-1">{option.emoji}</div>
                             <div className="text-sm font-medium text-text-primary">{option.label}</div>
@@ -408,9 +403,9 @@ export default function CostCalculator({ country, isOpen, onClose }: CostCalcula
                         <div>
                           <h4 className="text-sm font-semibold text-yellow-600 dark:text-yellow-400 mb-1">Important Disclaimer</h4>
                           <p className="text-xs text-text-secondary leading-relaxed">
-                            These are rough estimates based on available data and may not reflect current prices. 
-                            Actual costs vary significantly based on lifestyle, exact location, exchange rates, and timing. 
-                            We recommend adding a 20-30% buffer for unexpected expenses. Always verify costs with 
+                            These are rough estimates based on available data and may not reflect current prices.
+                            Actual costs vary significantly based on lifestyle, exact location, exchange rates, and timing.
+                            We recommend adding a 20-30% buffer for unexpected expenses. Always verify costs with
                             recent sources before making financial decisions.
                           </p>
                         </div>
@@ -441,7 +436,7 @@ export default function CostCalculator({ country, isOpen, onClose }: CostCalcula
                       Back
                     </motion.button>
                   )}
-                  
+
                   {step < 3 && !calculating && (
                     <motion.button
                       onClick={handleNext}
@@ -455,14 +450,14 @@ export default function CostCalculator({ country, isOpen, onClose }: CostCalcula
 
                   {step === 3 && (
                     <>
-                      <motion.button
+                      {/* <motion.button
                         onClick={handleReset}
                         className="flex-1 px-6 py-3 bg-bg-secondary dark:bg-dark-bg-secondary text-text-primary font-medium rounded-full hover:bg-bg-tertiary dark:hover:bg-dark-bg-tertiary transition-colors"
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                       >
                         Recalculate
-                      </motion.button>
+                      </motion.button> */}
                       <motion.button
                         onClick={() => router.push(`/explore?country=${country.code}&action=roadmap`)}
                         className="flex-1 px-6 py-3 bg-gradient-to-r from-accent-primary to-accent-secondary text-white font-semibold rounded-full shadow-card hover:shadow-card-hover transition-shadow"
