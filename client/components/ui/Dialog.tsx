@@ -48,22 +48,20 @@ export const Dialog = ({
         >
           {/* Backdrop */}
           <DialogBackdrop
-            as={motion.div}
+            as={motion.div as any}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
             className="fixed inset-0 bg-black/40 backdrop-blur-md"
           />
 
           {/* Full-screen container */}
           <div className="fixed inset-0 flex items-center justify-center p-4">
             <DialogPanel
-              as={motion.div}
+              as={motion.div as any}
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              transition={{ duration: 0.3, type: 'spring', stiffness: 300 }}
               className={cn(
                 'relative w-full rounded-2xl glass-heavy p-6',
                 'shadow-2xl',

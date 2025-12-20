@@ -43,7 +43,7 @@ class RoadmapViewSet(viewsets.ModelViewSet):
         
         step = get_object_or_404(RoadmapStep, id=step_id, roadmap=roadmap)
         status_obj, created = RoadmapStepStatus.objects.get_or_create(step=step)
-        status_obj.completed = True
+        status_obj.completed = True  # Model field name remains 'completed'
         status_obj.notes = request.data.get('notes', '')
         status_obj.save()
         
@@ -57,8 +57,8 @@ class RoadmapViewSet(viewsets.ModelViewSet):
         
         step = get_object_or_404(RoadmapStep, id=step_id, roadmap=roadmap)
         status_obj, created = RoadmapStepStatus.objects.get_or_create(step=step)
-        status_obj.blocked = True
-        status_obj.blocker_reason = request.data.get('blocker_reason', '')
+        status_obj.blocked = True  # Model field name remains 'blocked'
+        status_obj.blocker_reason = request.data.get('blocker_reason', '')  # Model field name
         status_obj.save()
         
         return Response({'success': True, 'step_id': step_id})
@@ -104,7 +104,15 @@ def generate_roadmap(request):
                                  {'title': 'Application', 'desc': 'Submit forms'}], 1):
             RoadmapStep.objects.create(roadmap=roadmap, order=i, title=s['title'], description=s['desc'])
     
-    enrich_roadmap_with_ai.delay(roadmap.id)
+    # Enrich roadmap with AI synchronously (can be changed back to .delay() for async)
+    try:
+        enrich_roadmap_with_ai(roadmap.id)
+    except Exception as e:
+        # Log error but still return roadmap
+        print(f"AI enrichment failed for roadmap {roadmap.id}: {str(e)}")
+    
+    # Refresh roadmap to get AI-enriched data
+    roadmap.refresh_from_db()
     return Response(RoadmapDetailSerializer(roadmap).data, status=201)
 
 

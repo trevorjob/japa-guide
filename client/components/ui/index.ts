@@ -8,7 +8,7 @@ export { Dialog } from './Dialog';
 export { Tabs } from './Tabs';
 
 // Loading Components
-export { Spinner, PassportLoader, PlaneLoader, SkeletonCard, ProgressBar } from './Loading';
+export { Spinner, PassportLoader, PlaneLoader, Skeleton, ProgressBar } from './Loading';
 
 // Layout Components
 export { Card } from './Card';

@@ -36,7 +36,7 @@ export interface Country {
   flag_png_url?: string;
   hero_image: string | null;
   summary: string;
-  
+
   // Cost & Difficulty
   cost_of_living_index: number | null;
   difficulty_score: number | null;
@@ -45,26 +45,26 @@ export interface Country {
   healthcare_monthly_usd: string | null;
   cpi_annual_change?: number | null;
   ppp_conversion_factor?: number | null;
-  
+
   // Migration Metrics (from UNHCR)
   refugees_in?: number | null;
   refugees_out?: number | null;
   asylum_seekers?: number | null;
   net_migration?: number | null;
   idp_count?: number | null;
-  
+
   // Economic Indicators (from World Bank)
   gdp_per_capita_usd?: number | null;
   unemployment_rate?: number | null;
   life_expectancy?: number | null;
   literacy_rate?: number | null;
-  
+
   // Visa Info
   visa_summary?: string;
   visa_types_count?: number;
   visa_last_reviewed?: string | null;
   immigration_url?: string;
-  
+
   // Data Quality & Tracking
   data_quality_score?: number;
   data_confidence?: 'low' | 'medium' | 'high';
@@ -76,7 +76,7 @@ export interface Country {
   migration_data_last_synced?: string | null;
   economic_data_source?: string;
   economic_data_last_synced?: string | null;
-  
+
   // Metadata & Timestamps
   metadata: Record<string, any>;
   created_at: string;
@@ -140,10 +140,12 @@ export interface UserProfile {
 
 export interface Roadmap {
   id: number;
+  title: string;
   user: number | null;
   session_id: string;
   country: number;
   country_name?: string;
+  country_code?: string;
   visa_type: number | null;
   goal: string;
   education_level: string;
@@ -152,11 +154,16 @@ export interface Roadmap {
   skills: string[];
   budget: number;
   target_date: string | null;
-  ai_personality: string;
+  ai_tone: string;  // Backend field name
+  ai_personality: string;  // Alias for ai_tone
   is_ai_enriched: boolean;
+  is_anonymous?: boolean;
+  status?: string;
+  profile_snapshot?: Record<string, any>;
   created_at: string;
   updated_at: string;
   steps: RoadmapStep[];
+
 }
 
 export interface RoadmapStep {

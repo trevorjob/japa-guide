@@ -126,6 +126,7 @@ class RoadmapStep(models.Model):
     )
     tips = models.JSONField(default=list, blank=True)
     pitfalls = models.JSONField(default=list, blank=True)
+    documents_needed = models.JSONField(default=list, blank=True)
     
     # AI enhancement
     ai_enhanced = models.BooleanField(

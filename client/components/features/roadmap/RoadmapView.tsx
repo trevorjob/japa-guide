@@ -94,7 +94,7 @@ export default function RoadmapView({ roadmap, onStepComplete, onStepIncomplete 
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div className="text-center">
               <div className="text-2xl font-bold text-text-primary">
-                {roadmap.country_detail?.name || roadmap.country}
+                {roadmap.country}
               </div>
               <div className="text-sm text-text-secondary">Destination</div>
             </div>

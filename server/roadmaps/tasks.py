@@ -8,7 +8,7 @@ from .models import Roadmap, RoadmapStep
 from ai.services import ai_service
 
 
-@shared_task
+# @shared_task  # Commented out for synchronous execution - uncomment for async with Celery
 def enrich_roadmap_with_ai(roadmap_id):
     """
     Enrich roadmap steps with AI personalization.

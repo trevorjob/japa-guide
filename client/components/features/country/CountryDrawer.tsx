@@ -391,7 +391,7 @@ export default function CountryDrawer({ countryCode, isOpen, onClose, onChatOpen
                       )}
                     </h3>
                     <div className="space-y-2">
-                      {countryData.refugees_in !== null && countryData.refugees_in > 0 && (
+                      {countryData.refugees_in != null && countryData.refugees_in > 0 && (
                         <div className="flex justify-between items-center p-3 bg-bg-secondary dark:bg-dark-bg-secondary rounded-lg">
                           <span className="text-sm text-text-tertiary">Refugees Hosted</span>
                           <span className="text-sm font-semibold text-text-primary">
@@ -399,7 +399,7 @@ export default function CountryDrawer({ countryCode, isOpen, onClose, onChatOpen
                           </span>
                         </div>
                       )}
-                      {countryData.asylum_seekers !== null && countryData.asylum_seekers > 0 && (
+                      {countryData.asylum_seekers != null && countryData.asylum_seekers > 0 && (
                         <div className="flex justify-between items-center p-3 bg-bg-secondary dark:bg-dark-bg-secondary rounded-lg">
                           <span className="text-sm text-text-tertiary">Asylum Seekers</span>
                           <span className="text-sm font-semibold text-text-primary">
@@ -407,7 +407,7 @@ export default function CountryDrawer({ countryCode, isOpen, onClose, onChatOpen
                           </span>
                         </div>
                       )}
-                      {countryData.net_migration !== null && countryData.net_migration !== 0 && (
+                      {countryData.net_migration != null && countryData.net_migration !== 0 && (
                         <div className="flex justify-between items-center p-3 bg-bg-secondary dark:bg-dark-bg-secondary rounded-lg">
                           <span className="text-sm text-text-tertiary">Net Migration</span>
                           <span className={`text-sm font-semibold ${countryData.net_migration > 0 ? 'text-green-500' : 'text-red-500'}`}>
