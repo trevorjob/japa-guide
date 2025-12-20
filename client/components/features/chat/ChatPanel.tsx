@@ -235,7 +235,7 @@ export default function ChatPanel({ onClose }: { onClose?: () => void }) {
       exit={{ y: '100%', opacity: 0 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
     >
-      <div className="w-full md:w-96 h-[70vh] md:max-h-[calc(100vh-56px)] md:h-auto glass-heavy glass-shine rounded-t-2xl md:rounded-2xl shadow-float flex flex-col">
+      <div className="w-full md:w-96 h-[70vh] md:max-h-[calc(100vh-56px)] md:h-auto glass-heavy rounded-t-2xl md:rounded-2xl shadow-float flex flex-col">
         {/* Header */}
         <div className="shrink-1 p-4 border-b border-white/5">
           <div className="flex items-center justify-between mb-3">
