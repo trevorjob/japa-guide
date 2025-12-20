@@ -18,9 +18,10 @@ interface MapCanvasProps {
   selectedRegion?: string | null;
   onCountrySelect?: (code: string) => void;
   onResultsUpdate?: (count: number, countries: string[]) => void;
+  isInteractionDisabled?: boolean;
 }
 
-export default function MapCanvas({ selectedCountry, filters, selectedRegion, onCountrySelect, onResultsUpdate }: MapCanvasProps) {
+export default function MapCanvas({ selectedCountry, filters, selectedRegion, onCountrySelect, onResultsUpdate, isInteractionDisabled = false }: MapCanvasProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -37,6 +38,13 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
   const lastRenderKeyRef = useRef<string>('');
   // Track previous selected country to detect deselection
   const prevSelectedCountryRef = useRef<string | null>(null);
+
+  // Clear tooltip when interactions are disabled
+  useEffect(() => {
+    if (isInteractionDisabled) {
+      setTooltip(null);
+    }
+  }, [isInteractionDisabled]);
 
   // Fetch all countries once on mount for color reference
   useEffect(() => {
@@ -64,24 +72,24 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
       try {
         setLoading(true);
         const params: any = {};
-        
+
         if (filters?.region) {
           params.region = filters.region;
         }
-        
+
         if (filters?.search) {
           params.search = filters.search;
         }
-        
+
         const response = await countryService.getAll(params);
         console.log(`Loaded ${response.length} countries from API`);
         setCountriesData(response);
-        
+
         // Notify parent of results
         if (onResultsUpdate) {
           onResultsUpdate(response.length, response.map(c => c.code.toLowerCase()));
         }
-        
+
         setLoading(false);
       } catch (error) {
         console.error('Error fetching countries:', error);
@@ -117,11 +125,11 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
 
     // Capture ref at start for cleanup
     const svgElement = svgRef.current;
-    
+
     // Create a render key based on what actually affects the map appearance
     const countryCodes = countriesData.map(c => c.code).sort().join(',');
     const renderKey = `${dimensions.width}x${dimensions.height}|${countryCodes}|${filters?.region || ''}`;
-    
+
     // Skip re-render if nothing important changed
     if (lastRenderKeyRef.current === renderKey && mapRenderedRef.current) {
       return;
@@ -157,14 +165,14 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
     const countryDataMap = new Map(
       countriesData.map(c => [c.code.toUpperCase(), c])
     );
-    
+
     // Also create map by alpha-2 codes for better matching
     const countryDataByAlpha2 = new Map(
       countriesData
         .map(c => [c.code_alpha2?.toUpperCase(), c] as const)
         .filter((entry): entry is [string, typeof entry[1]] => !!entry[0])
     );
-    
+
     console.log('🗺️ Map Debug:', {
       totalCountriesFromAPI: countriesData.length,
       countriesWithAlpha2: Array.from(countryDataByAlpha2.keys()).length,
@@ -176,7 +184,7 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
       .then(response => response.json())
       .then((worldData: any) => {
         const countries: any = feature(worldData, worldData.objects.countries);
-        
+
         // Create a mapping from numeric ISO codes to alpha-2 codes
         // This maps the TopoJSON's numeric 'id' to our API's alpha-2 codes
         const numericToAlpha2: Record<string, string> = {
@@ -230,7 +238,7 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
           '858': 'UY', '860': 'UZ', '862': 'VE', '876': 'WF', '882': 'WS',
           '887': 'YE', '894': 'ZM'
         };
-        
+
         // Debug: Check mapping coverage
         const totalFeatures = countries.features.length;
         const mappedFeatures = countries.features.filter((f: any) => numericToAlpha2[f.id]).length;
@@ -238,7 +246,7 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
           const alpha2 = numericToAlpha2[f.id];
           return alpha2 && countryDataByAlpha2.has(alpha2);
         }).length;
-        
+
         console.log('🌍 TopoJSON Mapping Stats:', {
           totalFeatures,
           mappedFeatures,
@@ -280,7 +288,7 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
             // Map numeric ID to alpha-2 code
             const alpha2 = numericToAlpha2[d.id];
             const countryData = alpha2 ? countryDataByAlpha2.get(alpha2) : null;
-            
+
             // If there's an active filter, highlight only filtered countries
             if (hasActiveFilter) {
               if (alpha2 && filteredCountryCodes.has(alpha2)) {
@@ -294,7 +302,7 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
                 return '#2A2A2A';
               }
             }
-            
+
             // No filter - use region-based colors
             if (countryData && countryData.region) {
               return regionColors[countryData.region] || defaultColor;
@@ -322,10 +330,11 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
             return alpha2 && countryDataByAlpha2.has(alpha2) ? 'pointer' : 'default';
           })
           .style('transition', 'all 0.2s ease')
-          .on('mouseover', function(event, d: any) {
+          .on('mouseover', function (event, d: any) {
+            if (isInteractionDisabled) return;
             const alpha2 = numericToAlpha2[d.id];
             const countryData = alpha2 ? countryDataByAlpha2.get(alpha2) : null;
-            
+
             if (countryData) {
               d3.select(this)
                 .attr('fill', '#0FF')
@@ -338,10 +347,11 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
               });
             }
           })
-          .on('mousemove', function(event, d: any) {
+          .on('mousemove', function (event, d: any) {
+            if (isInteractionDisabled) return;
             const alpha2 = numericToAlpha2[d.id];
             const countryData = alpha2 ? countryDataByAlpha2.get(alpha2) : null;
-            
+
             if (countryData) {
               setTooltip({
                 x: event.clientX,
@@ -350,10 +360,10 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
               });
             }
           })
-          .on('mouseout', function(event, d: any) {
+          .on('mouseout', function (event, d: any) {
             const alpha2 = numericToAlpha2[d.id];
             const countryData = alpha2 ? countryDataByAlpha2.get(alpha2) : null;
-            
+
             if (countryData) {
               d3.select(this)
                 .attr('fill', countryData.region ? (regionColors[countryData.region] || defaultColor) : '#E0E0E0')
@@ -362,14 +372,14 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
 
             setTooltip(null);
           })
-          .on('click', function(event, d: any) {
+          .on('click', function (event, d: any) {
             const alpha2 = numericToAlpha2[d.id];
             const countryData = alpha2 ? countryDataByAlpha2.get(alpha2) : null;
-            
+
             if (countryData) {
               // Set highlighted country
               setHighlightedCountry(alpha2);
-              
+
               // Zoom to country
               const bounds = path.bounds(d);
               const dx = bounds[1][0] - bounds[0][0];
@@ -389,7 +399,7 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
               // Set transitioning state
               setIsTransitioning(true);
               setHighlightedCountry(alpha2);
-              
+
               // Highlight selected country
               g.selectAll('path')
                 .transition()
@@ -410,7 +420,7 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
                   const pathAlpha2 = numericToAlpha2[pathData.id];
                   return pathAlpha2 === alpha2 ? 'drop-shadow(0 0 15px #0FF) drop-shadow(0 0 25px #0FF)' : 'none';
                 });
-              
+
               // Trigger callback after zoom animation
               setTimeout(() => {
                 setIsTransitioning(false);
@@ -466,7 +476,7 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
           const selectedCode = selectedCountry.toUpperCase();
           const selectedCountryData = countryDataMap.get(selectedCode);
           const selectedAlpha2 = selectedCountryData?.code_alpha2?.toUpperCase();
-          
+
           const selectedFeature = countries.features.find((f: any) => {
             const alpha2 = numericToAlpha2[f.id];
             return alpha2 === selectedAlpha2;
@@ -536,11 +546,11 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
     if (!svgRef.current || dimensions.width === 0 || loading) return;
     // Wait for allCountriesData to be loaded for proper color reset
     if (allCountriesData.length === 0) return;
-    
+
     const svg = d3.select(svgRef.current);
     const g = svg.select('g');
     if (g.empty()) return;
-    
+
     // Build country data maps - use allCountriesData for complete color reference
     const countryDataMap = new Map(
       allCountriesData.map(c => [c.code.toUpperCase(), c])
@@ -550,15 +560,15 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
         .map(c => [c.code_alpha2?.toUpperCase(), c] as const)
         .filter((entry): entry is [string, typeof entry[1]] => !!entry[0])
     );
-    
+
     // Check if there's an active filter
     const hasActiveFilter = filters?.region || filters?.search;
-    
+
     // Create a set of filtered country alpha-2 codes for quick lookup
     const filteredCountryCodes = new Set(
       countriesData.map(c => c.code_alpha2?.toUpperCase()).filter(Boolean)
     );
-    
+
     // Region-based color palette (cool, cohesive tones)
     const regionColors: Record<string, string> = {
       'Africa': '#64748B',      // Slate
@@ -568,7 +578,7 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
       'Oceania': '#14B8A6',     // Teal-green
     };
     const defaultColor = '#475569';
-    
+
     // Numeric to alpha2 mapping
     const numericToAlpha2: Record<string, string> = {
       '004': 'AF', '008': 'AL', '012': 'DZ', '016': 'AS', '020': 'AD', '024': 'AO',
@@ -605,33 +615,33 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
       '834': 'TZ', '840': 'US', '858': 'UY', '860': 'UZ', '862': 'VE',
       '704': 'VN', '887': 'YE', '894': 'ZM', '716': 'ZW'
     };
-    
+
     if (selectedCountry) {
       const selectedCode = selectedCountry.toUpperCase();
       const selectedCountryData = countryDataMap.get(selectedCode);
       const selectedAlpha2 = selectedCountryData?.code_alpha2?.toUpperCase();
-      
+
       if (selectedAlpha2) {
         // Highlight selected country - dim others
         g.selectAll('path')
           .transition()
           .duration(300)
-          .attr('fill', function() {
+          .attr('fill', function () {
             const pathData = d3.select(this).datum() as any;
             const alpha2 = numericToAlpha2[pathData?.id];
             return alpha2 === selectedAlpha2 ? '#0FF' : '#3A3A3A';
           })
-          .attr('stroke-width', function() {
+          .attr('stroke-width', function () {
             const pathData = d3.select(this).datum() as any;
             const alpha2 = numericToAlpha2[pathData?.id];
             return alpha2 === selectedAlpha2 ? 3 : 0.5;
           })
-          .attr('stroke', function() {
+          .attr('stroke', function () {
             const pathData = d3.select(this).datum() as any;
             const alpha2 = numericToAlpha2[pathData?.id];
             return alpha2 === selectedAlpha2 ? '#0FF' : '#1E1E1E';
           })
-          .style('filter', function() {
+          .style('filter', function () {
             const pathData = d3.select(this).datum() as any;
             const alpha2 = numericToAlpha2[pathData?.id];
             return alpha2 === selectedAlpha2 ? 'drop-shadow(0 0 15px #0FF) drop-shadow(0 0 25px #0FF)' : 'none';
@@ -643,12 +653,12 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
       g.selectAll('path')
         .transition()
         .duration(400)
-        .attr('fill', function() {
+        .attr('fill', function () {
           const pathData = d3.select(this).datum() as any;
           const alpha2 = numericToAlpha2[pathData?.id];
           // Use allCountryDataByAlpha2 for proper color reference
           const countryData = alpha2 ? allCountryDataByAlpha2.get(alpha2) : null;
-          
+
           // If there's an active filter, highlight only filtered countries
           if (hasActiveFilter) {
             if (alpha2 && filteredCountryCodes.has(alpha2)) {
@@ -662,14 +672,14 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
               return '#2A2A2A';
             }
           }
-          
+
           // No filter - normal region-based colors using all countries data
           if (countryData && countryData.region) {
             return regionColors[countryData.region] || defaultColor;
           }
           return alpha2 ? '#E0E0E0' : '#F5F5F5';
         })
-        .attr('stroke-width', function() {
+        .attr('stroke-width', function () {
           const pathData = d3.select(this).datum() as any;
           const alpha2 = numericToAlpha2[pathData?.id];
           if (hasActiveFilter && alpha2 && filteredCountryCodes.has(alpha2)) {
@@ -677,7 +687,7 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
           }
           return 0.5;
         })
-        .attr('stroke', function() {
+        .attr('stroke', function () {
           const pathData = d3.select(this).datum() as any;
           const alpha2 = numericToAlpha2[pathData?.id];
           if (hasActiveFilter && alpha2 && filteredCountryCodes.has(alpha2)) {
@@ -686,7 +696,7 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
           return '#ffffff';
         })
         .style('filter', 'none');
-        
+
       // Handle zoom based on filter state
       if (hasActiveFilter && zoomRef.current) {
         // If region filter is active, zoom back to that region
@@ -696,7 +706,7 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
           const height = dimensions.height;
           const isMobile = width < 768;
           const baseScale = isMobile ? width / 2.5 : width / 7;
-          
+
           const regionBounds: Record<string, { center: [number, number], scale: number }> = {
             'Africa': { center: [20, 0], scale: isMobile ? width / 2.5 : width / 4 },
             'Americas': { center: [-80, 0], scale: isMobile ? width / 2.5 : width / 4 },
@@ -704,14 +714,14 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
             'Europe': { center: [15, 54], scale: isMobile ? width / 2 : width / 3 },
             'Oceania': { center: [140, -25], scale: isMobile ? width / 2.5 : width / 3.5 },
           };
-          
+
           const bounds = regionBounds[activeRegion];
           if (bounds) {
             const projection = geoMercator()
               .scale(bounds.scale)
               .center(bounds.center)
               .translate([width / 2, height / 2]);
-            
+
             svg.transition()
               .duration(750)
               .call(
@@ -736,13 +746,13 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
   // Handle region zoom when selectedRegion explicitly changes (from filter panel)
   useEffect(() => {
     if (!svgRef.current || dimensions.width === 0) return;
-    
+
     // Update ref to track previous selected country
     prevSelectedCountryRef.current = selectedCountry;
-    
+
     // Skip if a country is selected (country zoom takes precedence)
     if (selectedCountry) return;
-    
+
     // Only zoom when selectedRegion is explicitly set (from filter change)
     if (!selectedRegion) return;
 
@@ -831,21 +841,21 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
         ref={containerRef}
         className="absolute inset-0"
         initial={{ opacity: 0 }}
-        animate={{ 
+        animate={{
           opacity: 1,
           filter: selectedCountry || isTransitioning ? 'blur(4px)' : 'blur(0px)',
         }}
-        transition={{ 
+        transition={{
           opacity: { duration: 0.5 },
           filter: { duration: 0.5, ease: 'easeInOut' }
         }}
       >
-        <svg 
-          ref={svgRef} 
-          className="w-full h-full" 
+        <svg
+          ref={svgRef}
+          className="w-full h-full"
           style={{ display: 'block' }}
         />
-        
+
         {/* Countries Count Badge */}
         {!loading && countriesData.length > 0 && (
           <motion.div
@@ -862,7 +872,7 @@ export default function MapCanvas({ selectedCountry, filters, selectedRegion, on
             </div>
           </motion.div>
         )}
-        
+
         {/* Loading Indicator */}
         {loading && (
           <motion.div

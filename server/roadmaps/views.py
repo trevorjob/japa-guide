@@ -27,13 +27,25 @@ class RoadmapViewSet(viewsets.ModelViewSet):
     
     def get_queryset(self):
         """Get roadmaps for current user or session."""
+        print(f"DEBUG: User: {self.request.user}, Auth: {self.request.user.is_authenticated}")
         if self.request.user.is_authenticated:
             return Roadmap.objects.filter(user=self.request.user).prefetch_related('steps')
         else:
-            session_key = self.request.session.session_key
+            # Check for header-based session ID (more reliable for API/Client split)
+            header_session_id = self.request.META.get('HTTP_X_SESSION_ID')
+            print(f"DEBUG: Header Session ID: {header_session_id}")
+            
+            # Fallback to cookie-based session key
+            session_key = self.request.session.session_key or header_session_id
+            print(f"DEBUG: Final Session Key: {session_key}")
+            
             if not session_key:
+                print("DEBUG: No session key found, returning empty queryset")
                 return Roadmap.objects.none()
-            return Roadmap.objects.filter(session_id=session_key).prefetch_related('steps')
+            
+            qs = Roadmap.objects.filter(session_id=session_key).prefetch_related('steps')
+            print(f"DEBUG: Queryset count for session {session_key}: {qs.count()}")
+            return qs
     
     @action(detail=True, methods=['post'])
     def complete_step(self, request, pk=None):
@@ -78,10 +90,22 @@ def generate_roadmap(request):
     visa_type = VisaType.objects.filter(id=data.get('visa_type_id')).first() if data.get('visa_type_id') else None
     
     user = request.user if request.user.is_authenticated else None
-    session_id = '' if user else (request.session.session_key or '')
-    if not session_id and not user:
-        request.session.create()
-        session_id = request.session.session_key
+    
+    # Session handling: Check header, then cookie, then create new
+    header_session_id = request.META.get('HTTP_X_SESSION_ID')
+    session_id = ''
+    
+    if user:
+        session_id = ''
+    else:
+        # Prioritize existing session
+        if request.session.session_key:
+            session_id = request.session.session_key
+        elif header_session_id:
+            session_id = header_session_id
+        else:
+            request.session.create()
+            session_id = request.session.session_key or ''
     
     roadmap = Roadmap.objects.create(
         session_id=session_id, user=user, is_anonymous=(user is None),
@@ -113,7 +137,12 @@ def generate_roadmap(request):
     
     # Refresh roadmap to get AI-enriched data
     roadmap.refresh_from_db()
-    return Response(RoadmapDetailSerializer(roadmap).data, status=201)
+    
+    response_data = RoadmapDetailSerializer(roadmap).data
+    # return session_id so client can store it if needed
+    response_data['session_id'] = session_id
+    
+    return Response(response_data, status=201)
 
 
 @api_view(['POST'])

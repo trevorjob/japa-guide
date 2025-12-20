@@ -43,19 +43,19 @@ function MapPageContent() {
   // Update URL without page reload
   const updateURL = (params: { country?: string | null; chat?: boolean }) => {
     const url = new URL(window.location.href);
-    
+
     if (params.country) {
       url.searchParams.set('country', params.country);
     } else if (params.country === null) {
       url.searchParams.delete('country');
     }
-    
+
     if (params.chat === true) {
       url.searchParams.set('chat', 'true');
     } else if (params.chat === false) {
       url.searchParams.delete('chat');
     }
-    
+
     window.history.pushState({}, '', url.toString());
   };
 
@@ -67,7 +67,7 @@ function MapPageContent() {
   const handleCountryClose = useCallback(() => {
     setSelectedCountry(null);
     updateURL({ country: null });
-    
+
     // Clear filters if we auto-selected from a single search result
     // This prevents the drawer from immediately reopening
     setMapFilters(prev => {
@@ -106,20 +106,24 @@ function MapPageContent() {
     setSelectedRegion(filters.region || null);
   }, []);
 
+  const isOverlayOpen = !!selectedCountry || chatOpen;
+
   return (
     <div className="relative w-full h-full overflow-hidden">
       {/* Layer 0: Map Canvas (Always visible) */}
-      <MapCanvas 
-        selectedCountry={selectedCountry} 
+      <MapCanvas
+        selectedCountry={selectedCountry}
         filters={mapFilters}
         selectedRegion={selectedRegion}
         onCountrySelect={handleCountrySelect}
         onResultsUpdate={handleResultsUpdate}
+        isInteractionDisabled={isOverlayOpen}
       />
-      
+
       {/* Map Filters Panel */}
-      <MapFilters 
+      <MapFilters
         onFilterChange={handleFilterChange}
+        isVisible={!isOverlayOpen}
       />
 
       {/* Layer 1: Country Drawer */}
@@ -134,13 +138,13 @@ function MapPageContent() {
       {chatOpen && <ChatPanel onClose={handleChatClose} />}
 
       {/* Floating Chat Bubble (when not open) */}
-      {!chatOpen && (
-    
+      {!chatOpen && !selectedCountry && (
+
         <button
           onClick={handleChatOpen}
           className="fixed bottom-8 right-8 z-40 w-16 h-16 glass rounded-full shadow-float flex items-center justify-center text-white text-2xl hover:scale-110 transition-transform"
         >
-          <img width="32" height="32" src="https://img.icons8.com/liquid-glass-color/32/sms.png" alt="sms"/>
+          <img width="32" height="32" src="https://img.icons8.com/liquid-glass-color/32/sms.png" alt="sms" />
         </button>
       )}
     </div>
@@ -162,4 +166,3 @@ export default function ExplorePage() {
     </div>
   );
 }
-  

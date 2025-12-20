@@ -1,4 +1,4 @@
-import apiClient from './api';
+import apiClient, { saveSessionId } from './api';
 import type {
   Country,
   CountryListData,
@@ -125,6 +125,9 @@ export const visaService = {
 export const roadmapService = {
   async generate(data: RoadmapFormData): Promise<Roadmap> {
     const response = await apiClient.post('/roadmaps/generate/', data);
+    if (response.data.session_id) {
+      saveSessionId(response.data.session_id);
+    }
     return response.data;
   },
 

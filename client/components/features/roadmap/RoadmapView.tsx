@@ -128,21 +128,7 @@ export default function RoadmapView({ roadmap, onStepComplete, onStepIncomplete 
           ))}
       </div>
 
-      {/* Save Roadmap CTA (for anonymous users) */}
-      {roadmap.is_anonymous && (
-        <div className="mt-8 glass-heavy rounded-2xl p-6 text-center">
-          <h3 className="text-xl font-bold text-text-primary mb-2">Save Your Progress</h3>
-          <p className="text-text-secondary mb-4">
-            Create a free account to save your roadmap and track progress across devices.
-          </p>
-          <button
-            onClick={() => router.push('/register')}
-            className="px-6 py-3 bg-linear-to-r from-accent-primary to-accent-secondary text-white font-semibold rounded-full shadow-card hover:shadow-card-hover transition-shadow"
-          >
-            Create Free Account
-          </button>
-        </div>
-      )}
+
     </div>
   );
 }
@@ -174,20 +160,18 @@ function StepCard({ step, index, totalSteps, isExpanded, onToggle, onComplete, o
       )}
 
       <div
-        className={`glass-heavy rounded-2xl p-6 transition-all ${
-          isExpanded ? 'shadow-card' : 'hover:shadow-card-hover'
-        }`}
+        className={`glass-heavy rounded-2xl p-6 transition-all ${isExpanded ? 'shadow-card' : 'hover:shadow-card-hover'
+          }`}
       >
         <div className="flex items-start gap-4">
           {/* Checkbox */}
           <div className="flex-shrink-0 pt-1">
             <button
               onClick={isComplete ? onIncomplete : onComplete}
-              className={`w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all ${
-                isComplete
+              className={`w-12 h-12 rounded-full border-2 flex items-center justify-center transition-all ${isComplete
                   ? 'bg-accent-primary border-accent-primary text-white'
                   : 'border-bg-tertiary dark:border-dark-bg-tertiary hover:border-accent-primary'
-              }`}
+                }`}
             >
               {isComplete ? (
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -203,9 +187,8 @@ function StepCard({ step, index, totalSteps, isExpanded, onToggle, onComplete, o
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-4 mb-2">
               <h3
-                className={`text-xl font-semibold cursor-pointer ${
-                  isComplete ? 'text-text-secondary line-through' : 'text-text-primary'
-                }`}
+                className={`text-xl font-semibold cursor-pointer ${isComplete ? 'text-text-secondary line-through' : 'text-text-primary'
+                  }`}
                 onClick={onToggle}
               >
                 {step.title}

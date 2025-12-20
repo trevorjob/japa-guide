@@ -6,7 +6,7 @@ router = DefaultRouter()
 router.register(r'', RoadmapViewSet, basename='roadmap')
 
 urlpatterns = [
-    path('', include(router.urls)),
     path('generate/', generate_roadmap, name='generate-roadmap'),
     path('calc/estimate/', calculate_cost, name='calculate-cost'),
+    path('', include(router.urls)),
 ]

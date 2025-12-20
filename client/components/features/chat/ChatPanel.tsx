@@ -14,7 +14,7 @@ export default function ChatPanel({ onClose }: { onClose?: () => void }) {
   const searchParams = useSearchParams();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const countryCode = searchParams.get('country');
-  
+
   const [isMinimized, setIsMinimized] = useState(false);
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -145,7 +145,7 @@ export default function ChatPanel({ onClose }: { onClose?: () => void }) {
           role: msg.role as 'user' | 'assistant',
           content: msg.content,
         }));
-      
+
       // Add the current message to history
       conversationHistory.push({
         role: 'user',
@@ -200,27 +200,27 @@ export default function ChatPanel({ onClose }: { onClose?: () => void }) {
 
   const quickSuggestions = countryCode
     ? [
-        `Tell me about ${countryCode}`,
-        'What documents do I need?',
-        'How much should I save?',
-        'Timeline to move?',
-      ]
+      `Tell me about ${countryCode}`,
+      'What documents do I need?',
+      'How much should I save?',
+      'Timeline to move?',
+    ]
     : [
-        'Which country is easiest?',
-        'Compare Canada vs Australia',
-        'Budget-friendly options?',
-        'Best for tech workers?',
-      ];
+      'Which country is easiest?',
+      'Compare Canada vs Australia',
+      'Budget-friendly options?',
+      'Best for tech workers?',
+    ];
 
   if (isMinimized) {
     return (
       <motion.button
         onClick={() => setIsMinimized(false)}
-        className="fixed bottom-8 right-8 z-50 w-16 h-16 bg-linear-to-r from-accent-primary to-accent-secondary rounded-full shadow-float flex items-center justify-center text-white text-2xl"
+        className="fixed bottom-6 right-6 z-50 w-16 h-16 glass-light glass-shine shadow-float flex items-center justify-center text-white text-2xl"
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.9 }}
       >
-        <img width="32" height="32" src="https://img.icons8.com/liquid-glass-color/32/sms.png" alt="sms"/>
+        <img width="32" height="32" src="https://img.icons8.com/liquid-glass-color/32/sms.png" alt="sms" />
       </motion.button>
     );
   }
@@ -229,209 +229,208 @@ export default function ChatPanel({ onClose }: { onClose?: () => void }) {
 
   return (
     <motion.div
-      className="fixed bottom-0 right-0 md:right-8 md:bottom-8 w-full md:w-96 h-[70vh] md:max-h-[calc(100vh-56px)] md:h-auto glass-heavy glass-shine rounded-t-2xl md:rounded-2xl shadow-float z-50 flex flex-col"
+      className="fixed bottom-0 right-0 md:right-8 md:bottom-8 z-50"
       initial={{ y: '100%', opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       exit={{ y: '100%', opacity: 0 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
     >
-      {/* Header */}
-      <div className="shrink-1 p-4 border-b border-white/5">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">{currentPersonality.emoji}</span>
-            <div>
-              <div className="font-semibold text-text-primary">{currentPersonality.name}</div>
-              <div className="text-xs text-text-tertiary">
-                {loading ? 'Typing...' : 'Online'}
+      <div className="w-full md:w-96 h-[70vh] md:max-h-[calc(100vh-56px)] md:h-auto glass-heavy glass-shine rounded-t-2xl md:rounded-2xl shadow-float flex flex-col">
+        {/* Header */}
+        <div className="shrink-1 p-4 border-b border-white/5">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">{currentPersonality.emoji}</span>
+              <div>
+                <div className="font-semibold text-text-primary">{currentPersonality.name}</div>
+                <div className="text-xs text-text-tertiary">
+                  {loading ? 'Typing...' : 'Online'}
+                </div>
               </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handleClearChat}
+                className="p-2 hover:bg-bg-tertiary dark:hover:bg-dark-bg-tertiary rounded-lg transition-colors"
+                title="Clear chat"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+              </button>
+              {/* <button
+                onClick={() => setIsMinimized(true)}
+                className="p-2 hover:bg-bg-tertiary dark:hover:bg-dark-bg-tertiary rounded-lg transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                </svg>
+              </button> */}
+              <button
+                onClick={handleClose}
+                className="p-2 hover:bg-bg-tertiary dark:hover:bg-dark-bg-tertiary rounded-lg transition-colors"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleClearChat}
-              className="p-2 hover:bg-bg-tertiary dark:hover:bg-dark-bg-tertiary rounded-lg transition-colors"
-              title="Clear chat"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-              </svg>
-            </button>
-            {/* <button
-              onClick={() => setIsMinimized(true)}
-              className="p-2 hover:bg-bg-tertiary dark:hover:bg-dark-bg-tertiary rounded-lg transition-colors"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-              </svg>
-            </button> */}
-            <button
-              onClick={handleClose}
-              className="p-2 hover:bg-bg-tertiary dark:hover:bg-dark-bg-tertiary rounded-lg transition-colors"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-        </div>
+          {/* Context Badge */}
+          {countryCode && (
+            <div className="flex items-center gap-2 text-xs">
+              <span className="px-2 py-1 bg-accent-primary/10 text-accent-primary rounded-full">
+                📍 Discussing: {countryCode}
+              </span>
+            </div>
+          )}
 
-        {/* Context Badge */}
-        {countryCode && (
-          <div className="flex items-center gap-2 text-xs">
-            <span className="px-2 py-1 bg-accent-primary/10 text-accent-primary rounded-full">
-              📍 Discussing: {countryCode}
-            </span>
-          </div>
-        )}
-
-        {/* Personality Selector */}
-        <div className="flex gap-1 mt-3 overflow-x-auto pb-1">
-          {personalities.map((p) => (
-            <button
-              key={p.id}
-              onClick={() => handleToneChange(p.id)}
-              className={`px-2 py-1 rounded-lg text-xs transition-colors shrink-0 ${
-                selectedTone === p.id
+          {/* Personality Selector */}
+          <div className="flex gap-1 mt-3 overflow-x-auto pb-1">
+            {personalities.map((p) => (
+              <button
+                key={p.id}
+                onClick={() => handleToneChange(p.id)}
+                className={`px-2 py-1 rounded-lg text-xs transition-colors shrink-0 ${selectedTone === p.id
                   ? 'bg-accent-primary text-white'
                   : 'bg-bg-tertiary dark:bg-dark-bg-tertiary text-text-secondary hover:bg-accent-primary/20'
-              }`}
-              title={p.name}
-            >
-              {p.emoji}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
-        <AnimatePresence mode="popLayout">
-          {messages.map((msg) => (
-            <motion.div
-              key={msg.id}
-              className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              transition={{ duration: 0.2 }}
-            >
-              <div
-                className={`max-w-[85%] p-3 rounded-2xl ${
-                  msg.role === 'user'
-                    ? 'bg-accent-primary text-white'
-                    : 'bg-bg-secondary dark:bg-dark-bg-secondary text-text-primary'
-                }`}
-              >
-                {msg.role === 'assistant' ? (
-                  <div className="prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-headings:mt-3 prose-headings:mb-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-strong:text-inherit">
-                    <ReactMarkdown
-                      components={{
-                        // Custom styling for markdown elements
-                        h1: ({ children }) => <h3 className="text-base font-bold mt-3 mb-1">{children}</h3>,
-                        h2: ({ children }) => <h4 className="text-sm font-bold mt-2 mb-1">{children}</h4>,
-                        h3: ({ children }) => <h5 className="text-sm font-semibold mt-2 mb-1">{children}</h5>,
-                        p: ({ children }) => <p className="my-1 text-sm leading-relaxed">{children}</p>,
-                        ul: ({ children }) => <ul className="my-1 ml-4 list-disc space-y-0.5">{children}</ul>,
-                        ol: ({ children }) => <ol className="my-1 ml-4 list-decimal space-y-0.5">{children}</ol>,
-                        li: ({ children }) => <li className="text-sm">{children}</li>,
-                        strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
-                        em: ({ children }) => <em className="italic">{children}</em>,
-                        a: ({ href, children }) => (
-                          <a href={href} target="_blank" rel="noopener noreferrer" className="text-accent-primary underline hover:text-accent-secondary">
-                            {children}
-                          </a>
-                        ),
-                        hr: () => <hr className="my-2 border-glass-border" />,
-                        blockquote: ({ children }) => (
-                          <blockquote className="border-l-2 border-accent-primary pl-2 my-2 italic text-text-secondary">
-                            {children}
-                          </blockquote>
-                        ),
-                      }}
-                    >
-                      {msg.content}
-                    </ReactMarkdown>
-                  </div>
-                ) : (
-                  <div className="whitespace-pre-wrap wrap-break-word text-sm">{msg.content}</div>
-                )}
-                <div
-                  className={`text-xs mt-1 ${
-                    msg.role === 'user' ? 'text-white/70' : 'text-text-tertiary'
                   }`}
-                >
-                  {new Date(msg.timestamp).toLocaleTimeString([], {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </div>
-              </div>
-            </motion.div>
-          ))}
-          {loading && (
-            <motion.div
-              className="flex justify-start"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              <div className="bg-bg-secondary dark:bg-dark-bg-secondary p-3 rounded-2xl">
-                <div className="flex gap-1">
-                  <span className="w-2 h-2 bg-text-tertiary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                  <span className="w-2 h-2 bg-text-tertiary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                  <span className="w-2 h-2 bg-text-tertiary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-        <div ref={messagesEndRef} />
-      </div>
-
-      {/* Quick Suggestions */}
-      {messages.length <= 2 && (
-        <div className="shrink-0 px-4 py-2">
-          <div className="text-xs text-text-tertiary mb-2">Quick questions:</div>
-          <div className="flex gap-2 overflow-x-auto pb-1">
-            {quickSuggestions.map((suggestion, index) => (
-              <button
-                key={index}
-                onClick={() => setMessage(suggestion)}
-                className="px-3 py-1.5 text-xs bg-bg-secondary dark:bg-dark-bg-secondary rounded-full whitespace-nowrap hover:bg-accent-primary hover:text-white transition-colors shrink-0"
+                title={p.name}
               >
-                {suggestion}
+                {p.emoji}
               </button>
             ))}
           </div>
         </div>
-      )}
 
-      {/* Input */}
-      <div className="shrink-0 p-4 border-t border-glass-border">
-        <div className="flex items-end gap-2">
-          <textarea
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                handleSend();
-              }
-            }}
-            placeholder="Ask me anything..."
-            rows={1}
-            className="flex-1 px-4 py-2 rounded-2xl bg-bg-secondary dark:bg-dark-bg-secondary border border-bg-tertiary dark:border-dark-bg-tertiary focus:border-accent-primary outline-none resize-none max-h-24 text-text-primary"
-            style={{ minHeight: '40px' }}
-            disabled={loading}
-          />
-          <button
-            onClick={handleSend}
-            disabled={!message.trim() || loading}
-            className="px-4 py-2 bg-accent-primary text-white rounded-full font-medium hover:bg-accent-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
-          >
-            {loading ? '...' : 'Send'}
-          </button>
+        {/* Messages */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+          <AnimatePresence mode="popLayout">
+            {messages.map((msg) => (
+              <motion.div
+                key={msg.id}
+                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.2 }}
+              >
+                <div
+                  className={`max-w-[85%] p-3 rounded-2xl ${msg.role === 'user'
+                    ? 'bg-accent-primary text-white'
+                    : 'bg-bg-secondary dark:bg-dark-bg-secondary text-text-primary'
+                    }`}
+                >
+                  {msg.role === 'assistant' ? (
+                    <div className="prose prose-sm dark:prose-invert max-w-none prose-p:my-1 prose-headings:mt-3 prose-headings:mb-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-strong:text-inherit">
+                      <ReactMarkdown
+                        components={{
+                          // Custom styling for markdown elements
+                          h1: ({ children }) => <h3 className="text-base font-bold mt-3 mb-1">{children}</h3>,
+                          h2: ({ children }) => <h4 className="text-sm font-bold mt-2 mb-1">{children}</h4>,
+                          h3: ({ children }) => <h5 className="text-sm font-semibold mt-2 mb-1">{children}</h5>,
+                          p: ({ children }) => <p className="my-1 text-sm leading-relaxed">{children}</p>,
+                          ul: ({ children }) => <ul className="my-1 ml-4 list-disc space-y-0.5">{children}</ul>,
+                          ol: ({ children }) => <ol className="my-1 ml-4 list-decimal space-y-0.5">{children}</ol>,
+                          li: ({ children }) => <li className="text-sm">{children}</li>,
+                          strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
+                          em: ({ children }) => <em className="italic">{children}</em>,
+                          a: ({ href, children }) => (
+                            <a href={href} target="_blank" rel="noopener noreferrer" className="text-accent-primary underline hover:text-accent-secondary">
+                              {children}
+                            </a>
+                          ),
+                          hr: () => <hr className="my-2 border-glass-border" />,
+                          blockquote: ({ children }) => (
+                            <blockquote className="border-l-2 border-accent-primary pl-2 my-2 italic text-text-secondary">
+                              {children}
+                            </blockquote>
+                          ),
+                        }}
+                      >
+                        {msg.content}
+                      </ReactMarkdown>
+                    </div>
+                  ) : (
+                    <div className="whitespace-pre-wrap wrap-break-word text-sm">{msg.content}</div>
+                  )}
+                  <div
+                    className={`text-xs mt-1 ${msg.role === 'user' ? 'text-white/70' : 'text-text-tertiary'
+                      }`}
+                  >
+                    {new Date(msg.timestamp).toLocaleTimeString([], {
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+            {loading && (
+              <motion.div
+                className="flex justify-start"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                <div className="bg-bg-secondary dark:bg-dark-bg-secondary p-3 rounded-2xl">
+                  <div className="flex gap-1">
+                    <span className="w-2 h-2 bg-text-tertiary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <span className="w-2 h-2 bg-text-tertiary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <span className="w-2 h-2 bg-text-tertiary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* Quick Suggestions */}
+        {messages.length <= 2 && (
+          <div className="shrink-0 px-4 py-2">
+            <div className="text-xs text-text-tertiary mb-2">Quick questions:</div>
+            <div className="flex gap-2 overflow-x-auto pb-1">
+              {quickSuggestions.map((suggestion, index) => (
+                <button
+                  key={index}
+                  onClick={() => setMessage(suggestion)}
+                  className="px-3 py-1.5 text-xs bg-bg-secondary dark:bg-dark-bg-secondary rounded-full whitespace-nowrap hover:bg-accent-primary hover:text-white transition-colors shrink-0"
+                >
+                  {suggestion}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Input */}
+        <div className="shrink-0 p-4 border-t border-glass-border">
+          <div className="flex items-end gap-2">
+            <textarea
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSend();
+                }
+              }}
+              placeholder="Ask me anything..."
+              rows={1}
+              className="flex-1 px-4 py-2 rounded-2xl bg-bg-secondary dark:bg-dark-bg-secondary border border-bg-tertiary dark:border-dark-bg-tertiary focus:border-accent-primary outline-none resize-none max-h-24 text-text-primary"
+              style={{ minHeight: '40px' }}
+              disabled={loading}
+            />
+            <button
+              onClick={handleSend}
+              disabled={!message.trim() || loading}
+              className="px-4 py-2 bg-accent-primary text-white rounded-full font-medium hover:bg-accent-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed shrink-0"
+            >
+              {loading ? '...' : 'Send'}
+            </button>
+          </div>
         </div>
       </div>
     </motion.div>

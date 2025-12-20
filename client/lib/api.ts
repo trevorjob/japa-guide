@@ -45,19 +45,34 @@ export const getRefreshToken = (): string | null => {
   return refreshToken;
 };
 
-// Request interceptor - add auth token
+// Request interceptor - add auth token & session header
 apiClient.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
     const token = getAccessToken();
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
+    // Add Custom Session ID for anonymous users
+    if (typeof window !== 'undefined') {
+      const sessionId = localStorage.getItem('session_id');
+      if (sessionId && config.headers) {
+        config.headers['X-Session-ID'] = sessionId;
+      }
+    }
+
     return config;
   },
   (error) => {
     return Promise.reject(error);
   }
 );
+
+export const saveSessionId = (id: string) => {
+  if (typeof window !== 'undefined' && id) {
+    localStorage.setItem('session_id', id);
+  }
+};
 
 // Response interceptor - handle token refresh
 let isRefreshing = false;

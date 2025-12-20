@@ -6,37 +6,55 @@
 /* Japaguide Design System - Cool Minimalist + Glass */
 :root {
   /* Primary Accent (Teal/Cyan - modern & cool) */
-  --accent-primary: #0EA5E9;       /* Sky blue */
-  --accent-primary-hover: #38BDF8;  /* Lighter sky */
-  --accent-secondary: #06B6D4;      /* Cyan */
-  --accent-tertiary: #14B8A6;       /* Teal */
+  --accent-primary: #0EA5E9;
+  /* Sky blue */
+  --accent-primary-hover: #38BDF8;
+  /* Lighter sky */
+  --accent-secondary: #06B6D4;
+  /* Cyan */
+  --accent-tertiary: #14B8A6;
+  /* Teal */
 
   /* Warm accent for CTAs (subtle warmth) */
-  --accent-warm: #F59E0B;           /* Amber for important CTAs */
+  --accent-warm: #F59E0B;
+  /* Amber for important CTAs */
   --accent-warm-hover: #FBBF24;
 
   /* Data Visualization (Cool blues/teals for map) */
-  --data-lowest: #ECFEFF;           /* Lightest cyan */
-  --data-low: #A5F3FC;              /* Light cyan */
-  --data-medium: #22D3EE;           /* Cyan */
-  --data-high: #0891B2;             /* Dark cyan */
-  --data-highest: #164E63;          /* Darkest cyan */
+  --data-lowest: #ECFEFF;
+  /* Lightest cyan */
+  --data-low: #A5F3FC;
+  /* Light cyan */
+  --data-medium: #22D3EE;
+  /* Cyan */
+  --data-high: #0891B2;
+  /* Dark cyan */
+  --data-highest: #164E63;
+  /* Darkest cyan */
 
   /* Dark Mode Color Palette - Refined */
-  --bg-primary: #09090B;            /* Near black with slight warmth */
-  --bg-secondary: #18181B;          /* Zinc 900 */
-  --bg-tertiary: #27272A;           /* Zinc 800 */
-  --bg-quaternary: #3F3F46;         /* Zinc 700 */
+  --bg-primary: #09090B;
+  /* Near black with slight warmth */
+  --bg-secondary: #18181B;
+  /* Zinc 900 */
+  --bg-tertiary: #27272A;
+  /* Zinc 800 */
+  --bg-quaternary: #3F3F46;
+  /* Zinc 700 */
 
-  --text-primary: #FAFAFA;          /* Zinc 50 */
-  --text-secondary: #A1A1AA;        /* Zinc 400 */
-  --text-tertiary: #71717A;         /* Zinc 500 */
-  --text-muted: #52525B;            /* Zinc 600 */
+  --text-primary: #FAFAFA;
+  /* Zinc 50 */
+  --text-secondary: #A1A1AA;
+  /* Zinc 400 */
+  --text-tertiary: #71717A;
+  /* Zinc 500 */
+  --text-muted: #52525B;
+  /* Zinc 600 */
 
   /* True Glassmorphism */
-  --glass-bg: rgba(24, 24, 27, 0.6);
-  --glass-bg-light: rgba(24, 24, 27, 0.4);
-  --glass-bg-heavy: rgba(24, 24, 27, 0.85);
+  --glass-bg: rgba(24, 24, 27, 0.4);
+  --glass-bg-light: rgba(24, 24, 27, 0.25);
+  --glass-bg-heavy: rgba(24, 24, 27, 0.75);
   --glass-border: rgba(255, 255, 255, 0.08);
   --glass-border-light: rgba(255, 255, 255, 0.12);
   --glass-shimmer: rgba(255, 255, 255, 0.05);
@@ -80,6 +98,28 @@
   --sidebar-accent-foreground: oklch(0.216 0.006 56.043);
   --sidebar-border: oklch(0.923 0.003 48.717);
   --sidebar-ring: oklch(0.709 0.01 56.259);
+}
+
+/* Only reset margin/padding on specific elements, not everything */
+body {
+  margin: 0;
+  padding: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.6;
+  letter-spacing: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
 }
 
 @theme inline {
@@ -132,31 +172,52 @@
   --font-family-mono: 'JetBrains Mono', monospace;
 
   /* Font Sizes */
-  --font-size-xs: 0.75rem;      /* 12px */
-  --font-size-sm: 0.875rem;     /* 14px */
-  --font-size-base: 1rem;       /* 16px */
-  --font-size-lg: 1.125rem;     /* 18px */
-  --font-size-xl: 1.25rem;      /* 20px */
-  --font-size-2xl: 1.5rem;      /* 24px */
-  --font-size-3xl: 1.875rem;    /* 30px */
-  --font-size-4xl: 2.25rem;     /* 36px */
-  --font-size-5xl: 3rem;        /* 48px */
+  --font-size-xs: 0.75rem;
+  /* 12px */
+  --font-size-sm: 0.875rem;
+  /* 14px */
+  --font-size-base: 1rem;
+  /* 16px */
+  --font-size-lg: 1.125rem;
+  /* 18px */
+  --font-size-xl: 1.25rem;
+  /* 20px */
+  --font-size-2xl: 1.5rem;
+  /* 24px */
+  --font-size-3xl: 1.875rem;
+  /* 30px */
+  --font-size-4xl: 2.25rem;
+  /* 36px */
+  --font-size-5xl: 3rem;
+  /* 48px */
 
   /* Spacing Scale */
-  --spacing-xs: 0.25rem;        /* 4px */
-  --spacing-sm: 0.5rem;         /* 8px */
-  --spacing-md: 1rem;           /* 16px */
-  --spacing-lg: 1.5rem;         /* 24px */
-  --spacing-xl: 2rem;           /* 32px */
-  --spacing-2xl: 3rem;          /* 48px */
-  --spacing-3xl: 4rem;          /* 64px */
+  --spacing-xs: 0.25rem;
+  /* 4px */
+  --spacing-sm: 0.5rem;
+  /* 8px */
+  --spacing-md: 1rem;
+  /* 16px */
+  --spacing-lg: 1.5rem;
+  /* 24px */
+  --spacing-xl: 2rem;
+  /* 32px */
+  --spacing-2xl: 3rem;
+  /* 48px */
+  --spacing-3xl: 4rem;
+  /* 64px */
 
   /* Border Radius */
-  --radius-sm: 0.5rem;          /* 8px */
-  --radius-md: 0.75rem;         /* 12px */
-  --radius-lg: 1rem;            /* 16px */
-  --radius-xl: 1.5rem;          /* 24px */
-  --radius-2xl: 2rem;           /* 32px */
+  --radius-sm: 0.5rem;
+  /* 8px */
+  --radius-md: 0.75rem;
+  /* 12px */
+  --radius-lg: 1rem;
+  /* 16px */
+  --radius-xl: 1.5rem;
+  /* 24px */
+  --radius-2xl: 2rem;
+  /* 32px */
   --radius-full: 9999px;
 
   /* Shadows - Refined for depth */
@@ -208,45 +269,24 @@
   --color-background: var(--background);
 }
 
-/* Only reset margin/padding on specific elements, not everything */
-body, h1, h2, h3, h4, h5, h6, p, ul, ol, li, figure, figcaption, blockquote, dl, dd {
-  margin: 0;
-  padding: 0;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-html {
-body {
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  font-family: var(--font-body);
-  font-size: 16px;
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  min-height: 100vh;
-}
 
 /* Glassmorphism Utilities - True Frosted Glass with Partial Borders */
 .glass {
   background: var(--glass-bg);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  backdrop-filter: blur(10px) saturate(180%);
+  -webkit-backdrop-filter: blur(10px) saturate(180%);
   border: none;
   border-top: 1px solid rgba(255, 255, 255, 0.12);
   border-left: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 
+  box-shadow:
     inset 0 1px 0 0 rgba(255, 255, 255, 0.05),
     0 4px 24px rgba(0, 0, 0, 0.2);
 }
 
 .glass-light {
   background: var(--glass-bg-light);
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
   border: none;
   border-top: 1px solid rgba(255, 255, 255, 0.15);
   border-left: 1px solid rgba(255, 255, 255, 0.1);
@@ -254,31 +294,29 @@ body {
 
 .glass-heavy {
   background: var(--glass-bg-heavy);
-  backdrop-filter: blur(24px) saturate(180%);
-  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
   border: none;
   border-top: 1px solid rgba(255, 255, 255, 0.15);
   border-left: 1px solid rgba(255, 255, 255, 0.1);
   border-right: 1px solid rgba(255, 255, 255, 0.03);
-  box-shadow: 
+  box-shadow:
     inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
     inset 1px 0 0 0 rgba(255, 255, 255, 0.03),
     0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .glass-card {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.06) 0%,
-    rgba(255, 255, 255, 0.02) 50%,
-    rgba(255, 255, 255, 0.01) 100%
-  );
-  backdrop-filter: blur(20px) saturate(180%);
-  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  background: linear-gradient(135deg,
+      rgba(255, 255, 255, 0.06) 0%,
+      rgba(255, 255, 255, 0.02) 50%,
+      rgba(255, 255, 255, 0.01) 100%);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
   border: none;
   border-top: 1px solid rgba(255, 255, 255, 0.12);
   border-left: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 
+  box-shadow:
     inset 0 1px 0 0 rgba(255, 255, 255, 0.05),
     0 4px 24px rgba(0, 0, 0, 0.15);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -287,7 +325,7 @@ body {
 .glass-card:hover {
   border-top-color: rgba(255, 255, 255, 0.18);
   border-left-color: rgba(255, 255, 255, 0.12);
-  box-shadow: 
+  box-shadow:
     inset 0 1px 0 0 rgba(255, 255, 255, 0.08),
     0 8px 40px rgba(0, 0, 0, 0.25);
   transform: translateY(-2px);
@@ -300,6 +338,7 @@ body {
   border: none;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
   border-left: 1px solid rgba(255, 255, 255, 0.04);
+}
 
 /* Glass border position utilities - for different light source angles */
 .glass-border-tl {
@@ -335,12 +374,10 @@ body {
   left: 0;
   right: 50%;
   bottom: 50%;
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.1) 0%,
-    rgba(255, 255, 255, 0.03) 50%,
-    transparent 100%
-  );
+  background: linear-gradient(135deg,
+      rgba(255, 255, 255, 0.1) 0%,
+      rgba(255, 255, 255, 0.03) 50%,
+      transparent 100%);
   pointer-events: none;
   border-radius: inherit;
 }
@@ -350,6 +387,7 @@ body {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -360,6 +398,7 @@ body {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -371,6 +410,7 @@ body {
     opacity: 0;
     transform: translateY(100%);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -382,6 +422,7 @@ body {
     opacity: 0;
     transform: translateX(100%);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -393,6 +434,7 @@ body {
     opacity: 0;
     transform: scale(0.9);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -400,18 +442,24 @@ body {
 }
 
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-10px);
   }
 }
 
 @keyframes pulse-glow {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 0.5;
   }
+
   50% {
     opacity: 1;
   }
@@ -444,6 +492,7 @@ body {
 
 /* Reduced Motion Support */
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
@@ -575,8 +624,8 @@ select:focus-visible {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
 }
-}}

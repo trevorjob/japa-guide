@@ -6,8 +6,8 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
 interface ButtonProps {
-  variant?: 'primary' | 'secondary' | 'ghost' | 'accent';
-  size?: 'sm' | 'md' | 'lg';
+  variant?: 'primary' | 'secondary' | 'ghost' | 'accent' | 'outline';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
   magnetic?: boolean;
   disabled?: boolean;
   children: React.ReactNode;
@@ -43,12 +43,14 @@ export const Button = ({
     ghost: 'hover:bg-bg-tertiary border border-transparent hover:border-glass-border text-text-primary',
     accent:
       'bg-gradient-to-r from-accent-warm to-amber-500 text-white shadow-lg hover:shadow-xl',
+    outline: 'border-2 border-current bg-transparent hover:bg-white/5',
   };
 
   const sizeStyles = {
     sm: 'px-4 py-2 text-sm',
     md: 'px-6 py-3 text-base',
     lg: 'px-8 py-4 text-lg',
+    xl: 'px-10 py-5 text-xl',
   };
 
   return (
