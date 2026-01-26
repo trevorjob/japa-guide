@@ -229,7 +229,7 @@ export default function ChatPanel({ onClose }: { onClose?: () => void }) {
 
   return (
     <motion.div
-      className="fixed bottom-0 right-0 md:right-8 md:bottom-8 z-50"
+      className="fixed bottom-0 right-0 w-full md:w-auto md:right-8 md:bottom-8 z-50"
       initial={{ y: '100%', opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       exit={{ y: '100%', opacity: 0 }}
