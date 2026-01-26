@@ -73,7 +73,8 @@ function MapPageContent() {
 
   const handleCountrySelect = useCallback((countryCode: string) => {
     setSelectedCountry(countryCode);
-    updateURL({ country: countryCode });
+    setChatOpen(false); // Explicitly close chat when selecting a country
+    updateURL({ country: countryCode, chat: false });
   }, []);
 
   const handleCountryClose = useCallback(() => {
